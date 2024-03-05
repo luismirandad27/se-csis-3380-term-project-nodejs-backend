@@ -20,7 +20,7 @@ const ProductSchema =  new mongoose.Schema({
     description: String,
     product_category_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "ProductCategories"
+        ref: "ProductCategory"
     },
     countries_origin : [String],
     tags : [String],
@@ -37,7 +37,7 @@ const ProductSchema =  new mongoose.Schema({
     product_subtype: [ProductSubtypeSchema],
     grind_types: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "GrindTypes"
+        ref: "GrindType"
     }]
   });
 
