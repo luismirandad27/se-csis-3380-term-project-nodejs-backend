@@ -37,7 +37,7 @@ const ProductSchema =  new mongoose.Schema({
     product_subtype: [ProductSubtypeSchema],
     grind_types: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "GrindTypes"
+        ref: "GrindType" // Should 
     }]
   });
 
