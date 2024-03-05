@@ -1,3 +1,14 @@
+/**
+ * auth.routes.js
+ * Javascript file with the API endpoints for User administration
+ *
+ *
+ * @version 1.0
+ * @author  Luis Miguel Miranda
+ * @updated 2024-02-02
+ *
+*/
+
 const { authJwt } = require("../middlewares");
 const controller = require("../controllers/user.controller");
 
@@ -10,6 +21,7 @@ module.exports = function(app) {
     next();
   });
 
+  /*
   app.get("/api/test/all", controller.allAccess);
 
   app.get("/api/test/user", [authJwt.verifyToken], controller.userBoard);
@@ -25,4 +37,6 @@ module.exports = function(app) {
     [authJwt.verifyToken, authJwt.isAdmin],
     controller.adminBoard
   );
+  */
+ 
 };

@@ -1,3 +1,14 @@
+/**
+ * auth.routes.js
+ * Javascript file with the API endpoints for User Sign In and Sign Up
+ *
+ *
+ * @version 1.0
+ * @author  Luis Miguel Miranda
+ * @updated 2024-02-02
+ *
+*/
+
 const { verifySignUp } = require("../middlewares");
 const controller = require("../controllers/auth.controller");
 

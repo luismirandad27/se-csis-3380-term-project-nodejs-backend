@@ -1,7 +1,19 @@
+/**
+ * verifySignUp.js
+ * Javascript file that compiles the methods to validate user's sign ups.
+ *
+ *
+ * @version 1.0
+ * @author  Luis Miguel Miranda
+ * @updated 2024-03-02
+ *
+*/
+
 const db = require("../models");
 const ROLES = db.ROLES;
 const User = db.user;
 
+// Function to review if a user is trying to register a new account with a username/email already registered
 checkDuplicateUsernameOrEmail = async (req, res, next) => {
   try {
     // Check if username already exists
@@ -23,6 +35,7 @@ checkDuplicateUsernameOrEmail = async (req, res, next) => {
   }
 };
 
+// Function to check that the role(s) added in the API request for registration are included in the database
 checkRolesExisted = (req, res, next) => {
   if (req.body.roles) {
     for (let i = 0; i < req.body.roles.length; i++) {
