@@ -1,3 +1,14 @@
+/**
+ * index.js
+ * Index file that compiles all javascripts files in the /models folder
+ *
+ *
+ * @version 1.0
+ * @author  Andrea Olivares - Valentina Alvarez - Luis Miguel Miranda
+ * @updated 2024-02-02
+ *
+*/
+
 const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
