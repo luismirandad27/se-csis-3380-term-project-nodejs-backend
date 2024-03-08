@@ -26,12 +26,14 @@ exports.createOrUpdateCart = async (req, res) => {
       
       // Validate if the product exists and has stock
       const productInDb = await Product
-        .findById(product.id)
+        .findOne({prod_id : product.id})
         .populate('product_subtype');
 
       if (!productInDb) {
         return res.status(404).send('Product not found');
       }
+
+      const productInDbId = productInDb._id.toString();
 
       const productSubtype = productInDb.product_subtype.find(subtype => subtype.weight.toString() === product.subtypeIdentifier);
 
@@ -49,7 +51,7 @@ exports.createOrUpdateCart = async (req, res) => {
       if (cart) {
 
         // User already has a cart, update it, retrieve the index of the product in the cart
-        const itemIndex = cart.items.findIndex(item => item.product.toString() === product.id && item.grindType.toString() === product.grindType && item.productSubtype.toString() === product.subtypeIdentifier);
+        const itemIndex = cart.items.findIndex(item => item.product.toString() === productInDbId && item.grindType.toString() === product.grindType && item.productSubtype.toString() === product.subtypeIdentifier);
 
         if (itemIndex > -1) {
 
@@ -60,7 +62,7 @@ exports.createOrUpdateCart = async (req, res) => {
 
           // Add new product to cart
           cart.items.push({
-            product: product.id,
+            product: productInDbId,
             productSubtype: product.subtypeIdentifier,
             grindType: product.grindType,
             quantity: product.quantity
@@ -75,7 +77,7 @@ exports.createOrUpdateCart = async (req, res) => {
         cart = new ShoppingCart({
           user: userId,
           items: [{
-            product: product.id,
+            product: productInDbId,
             productSubtype: product.subtypeIdentifier,
             grindType: product.grindType,
             quantity: product.quantity

@@ -9,6 +9,7 @@ const ReviewSchema = new mongoose.Schema({
 const ProductSubtypeSchema = new mongoose.Schema({
     price: Number, 
     stock: Number, 
+    image_url: String,
     weight: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "WeightType"
@@ -17,6 +18,7 @@ const ProductSubtypeSchema = new mongoose.Schema({
 
 const ProductSchema =  new mongoose.Schema({
     name: String,
+    prod_id: String,
     description: String,
     product_category_id: {
         type: mongoose.Schema.Types.ObjectId,
@@ -33,7 +35,6 @@ const ProductSchema =  new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "ImportPartner"
     },
-    image_urls:[String],
     product_subtype: [ProductSubtypeSchema],
     grind_types: [{
         type: mongoose.Schema.Types.ObjectId,

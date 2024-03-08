@@ -29,3 +29,22 @@ exports.getProductById = (req, res) => {
         res.status(500).send({ message: err });
     });
 };
+
+// GET product by field prod_id
+exports.getProductByProdId = (req, res) => {
+    // Find the product by the field prod_id
+    Product.findOne({ prod_id: req.params.id })
+        .populate("grind_types")
+        .populate("import_partner_id")
+        .populate("product_subtype.weight")
+        .then(product => {
+            if (!product) {
+                return res.status(404).send({ message: "Product Not found." });
+            }
+            res.send(product);
+        })
+        .catch(err => {
+            console.error("Error getting product:", err);
+            res.status(500).send({ message: err });
+        });
+};
