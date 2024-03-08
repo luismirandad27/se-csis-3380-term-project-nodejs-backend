@@ -9,7 +9,7 @@ const ReviewSchema = new mongoose.Schema({
 const ProductSubtypeSchema = new mongoose.Schema({
     price: Number, 
     stock: Number, 
-    image_url:String,
+    image_url: String,
     weight: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "WeightType"
