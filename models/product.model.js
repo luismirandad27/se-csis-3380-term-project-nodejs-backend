@@ -18,6 +18,7 @@ const ProductSubtypeSchema = new mongoose.Schema({
 
 const ProductSchema =  new mongoose.Schema({
     name: String,
+    prod_id: String,
     description: String,
     product_category_id: {
         type: mongoose.Schema.Types.ObjectId,
