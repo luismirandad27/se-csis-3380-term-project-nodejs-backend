@@ -3,7 +3,12 @@ const mongoose = require("mongoose");
 const ReviewSchema = new mongoose.Schema({
     title: String,
     comment: String,
-    rating: Number 
+    rating: Number ,
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
 });
 
 const ProductSubtypeSchema = new mongoose.Schema({

@@ -23,7 +23,6 @@ module.exports = function(app) {
 
   app.get(
     "/api/product/:id", 
-    //[authJwt.verifyToken],    
     controller.getProductByProdId);
  
 };

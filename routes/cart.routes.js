@@ -23,7 +23,7 @@ module.exports = function(app) {
 
   app.post(
     "/api/cart", 
-    //[authJwt.verifyToken],    
+    [authJwt.verifyToken],    
     controller.createOrUpdateCart
   );
 
