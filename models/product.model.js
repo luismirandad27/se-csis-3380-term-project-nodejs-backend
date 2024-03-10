@@ -20,7 +20,7 @@ const ProductSchema =  new mongoose.Schema({
     name: String,
     prod_id: String,
     description: String,
-    product_category_id: {
+    product_category: { // Rename 
         type: mongoose.Schema.Types.ObjectId,
         ref: "ProductCategory"
     },
@@ -31,11 +31,11 @@ const ProductSchema =  new mongoose.Schema({
     producer: String,
     region: String,
     process: String,
-    import_partner_id: {
+    import_partner: { // Rename
         type: mongoose.Schema.Types.ObjectId,
         ref: "ImportPartner"
     },
-    product_subtype: [ProductSubtypeSchema],
+    product_subtypes: [ProductSubtypeSchema], // Rename
     grind_types: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "GrindType"

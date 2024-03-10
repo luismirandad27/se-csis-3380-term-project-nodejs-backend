@@ -27,7 +27,7 @@ exports.createOrUpdateCart = async (req, res) => {
       // Validate if the product exists and has stock
       const productInDb = await Product
         .findOne({prod_id : product.id})
-        .populate('product_subtype');
+        .populate('product_subtypes');
 
       if (!productInDb) {
         return res.status(404).send('Product not found');
@@ -35,7 +35,7 @@ exports.createOrUpdateCart = async (req, res) => {
 
       const productInDbId = productInDb._id.toString();
 
-      const productSubtype = productInDb.product_subtype.find(subtype => subtype.weight.toString() === product.subtypeIdentifier);
+      const productSubtype = productInDb.product_subtypes.find(subtype => subtype.weight.toString() === product.subtypeIdentifier);
 
       if (!productSubtype) {
         return res.status(404).send('Product subtype not found');
@@ -56,7 +56,7 @@ exports.createOrUpdateCart = async (req, res) => {
         if (itemIndex > -1) {
 
           // This means that the product has been added before
-          cart.items[itemIndex].quantity += product.quantity;
+          cart.items[itemIndex].quantity += parseInt(product.quantity);
 
         } else {
 
@@ -65,7 +65,7 @@ exports.createOrUpdateCart = async (req, res) => {
             product: productInDbId,
             productSubtype: product.subtypeIdentifier,
             grindType: product.grindType,
-            quantity: product.quantity
+            quantity: parseInt(product.quantity)
           });
 
         }
@@ -80,13 +80,13 @@ exports.createOrUpdateCart = async (req, res) => {
             product: productInDbId,
             productSubtype: product.subtypeIdentifier,
             grindType: product.grindType,
-            quantity: product.quantity
+            quantity: parseInt(product.quantity)
           }]
         });
       }
 
       // Update stock of the product
-      productSubtype.stock -= product.quantity;
+      productSubtype.stock -= parseInt(product.quantity);
       await productInDb.save();
       
       // Save the cart
@@ -99,3 +99,72 @@ exports.createOrUpdateCart = async (req, res) => {
       res.status(500).send('Error creating or updating shopping cart');
     }
   };
+
+// GET user's cart
+exports.getCartByUserId = async (req, res) => {
+  const { userId } = req.params;
+  try {
+
+    // Get the ShoppingCart for the user including the items
+    const cart = await ShoppingCart.findOne({user: userId})
+                                    .populate('items.product')
+                                    .populate('items.grindType');
+
+    res.status(200).json(cart);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error retrieving shopping cart');
+  }
+};
+
+// REMOVE item from cart
+exports.removeItemFromCart = async (req, res) => {
+  const { userId, productSubtypeId } = req.params;
+  
+  try {
+
+    // Get the ShoppingCart for the user 
+    const cart = await ShoppingCart.findOne({user: userId});
+
+    // Find the item (index) in the cart, where productSubType is the same as the one to be removed
+    const itemIndexRemoved = cart.items.findIndex(item => item.productSubtype.toString() === productSubtypeId);
+
+    // Store the quantity we are removing
+    const productId = cart.items[itemIndexRemoved].product.toString();
+    const quantityRemoved = parseInt(cart.items[itemIndexRemoved].quantity);
+
+    // Remove the item
+    if (itemIndexRemoved > -1) {
+      cart.items.splice(itemIndexRemoved, 1);
+    }
+    else{
+      return res.status(400).send('Item not found in cart');
+    }
+    
+    // Then let's update the stock of the product subtype
+    const selectedProduct = await Product.findById(productId);
+    const productSubtypeIndex = selectedProduct.product_subtypes.findIndex(subtype => subtype.weight._id.toString() === productSubtypeId);
+    selectedProduct.product_subtypes[productSubtypeIndex].stock += quantityRemoved;
+    
+    // If the cart is empty let's remove it
+    if (cart.items.length === 0)
+    {
+      await ShoppingCart.findByIdAndDelete(cart._id);
+      
+    }else
+    {
+      await cart.save();
+    }
+
+    // Update the stock in the database
+    await selectedProduct.save();
+
+    res.status(200).json(cart);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error retrieving shopping cart');
+  }
+
+};
