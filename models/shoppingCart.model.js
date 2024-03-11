@@ -20,6 +20,11 @@ const ShoppingCartItemSchema = new mongoose.Schema({
         type: Number,
         required: true,
         min: 1
+    },
+    unitPrice: {
+        type: Number,
+        required: true,
+        min: 1
     }
 });
 

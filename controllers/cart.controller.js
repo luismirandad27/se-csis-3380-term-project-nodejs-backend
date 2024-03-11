@@ -21,7 +21,7 @@ exports.createOrUpdateCart = async (req, res) => {
     if (!userId || !product) {
       return res.status(400).send('Missing userId or product information');
     }
-  
+
     try {
       
       // Validate if the product exists and has stock
@@ -65,7 +65,8 @@ exports.createOrUpdateCart = async (req, res) => {
             product: productInDbId,
             productSubtype: product.subtypeIdentifier,
             grindType: product.grindType,
-            quantity: parseInt(product.quantity)
+            quantity: parseInt(product.quantity),
+            unitPrice: parseInt(product.price)
           });
 
         }
@@ -80,7 +81,8 @@ exports.createOrUpdateCart = async (req, res) => {
             product: productInDbId,
             productSubtype: product.subtypeIdentifier,
             grindType: product.grindType,
-            quantity: parseInt(product.quantity)
+            quantity: parseInt(product.quantity),
+            unitPrice: parseInt(product.price)
           }]
         });
       }
@@ -108,7 +110,11 @@ exports.getCartByUserId = async (req, res) => {
     // Get the ShoppingCart for the user including the items
     const cart = await ShoppingCart.findOne({user: userId})
                                     .populate('items.product')
-                                    .populate('items.grindType');
+                                    .populate('items.grindType')
+                                    .populate({
+                                        path: 'items.productSubtype',
+                                        model: 'WeightType'
+                                    });
 
     res.status(200).json(cart);
 
