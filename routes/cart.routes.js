@@ -23,7 +23,20 @@ module.exports = function(app) {
 
   app.post(
     "/api/cart", 
-    //[authJwt.verifyToken],    
-    controller.createOrUpdateCart);
+    [authJwt.verifyToken],    
+    controller.createOrUpdateCart
+  );
+
+  app.get(
+    "/api/cart/:userId",
+    //[authJwt.verifyToken],
+    controller.getCartByUserId
+  );
+
+  app.delete(
+    "/api/cart/:userId/:productSubtypeId",
+    //[authJwt.verifyToken],
+    controller.removeItemFromCart
+  )
 
 };

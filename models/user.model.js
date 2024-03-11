@@ -32,6 +32,7 @@ const UserSchema = new mongoose.Schema({
   password: String,
   address: String,
   phone: String,
+  gender: String, // New field
   roles: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -39,7 +40,8 @@ const UserSchema = new mongoose.Schema({
     }
   ],
   company: String,
-  purchaseOrders: [PurchaseOrderSchema]
+  purchaseOrders: [PurchaseOrderSchema],
+  created_at: Date
 });
 
 const User = mongoose.model("User", UserSchema);

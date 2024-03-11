@@ -16,8 +16,10 @@ const Product = db.product;
 exports.getProductById = (req, res) => {
     Product.findById(req.params.id)
     .populate("grind_types")
-    .populate("import_partner_id")
-    .populate("product_subtype.weight")
+    .populate("import_partner")
+    .populate("product_subtypes.weight")
+    .populate("product_category")
+    .populate("reviews.user")
     .then(product => {
         if (!product) {
             return res.status(404).send({ message: "Product Not found." });
@@ -35,8 +37,10 @@ exports.getProductByProdId = (req, res) => {
     // Find the product by the field prod_id
     Product.findOne({ prod_id: req.params.id })
         .populate("grind_types")
-        .populate("import_partner_id")
-        .populate("product_subtype.weight")
+        .populate("import_partner")
+        .populate("product_subtypes.weight")
+        .populate("product_category")
+        .populate("reviews.user")
         .then(product => {
             if (!product) {
                 return res.status(404).send({ message: "Product Not found." });
