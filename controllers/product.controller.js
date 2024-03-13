@@ -291,7 +291,7 @@ exports.getAllProducts = async (req, res) => {
                     }
                 }
             },
-            {// Given that we have unwinded the product_subtypes array, we filter the each document based on the conditions for product_subtypes
+            {// Given that we have unwound the product_subtypes array, we filter the each document based on the conditions for product_subtypes
                 $match: subtypeCondition            
                 
             },
