@@ -25,6 +25,7 @@ db.productCategory = require("./productCategory.model");
 db.product = require("./product.model");
 db.weightType = require("./weightType.model");
 db.shoppingCart = require("./shoppingCart.model");
+db.purchaseOrder = require("./purchaseOrder.model");
 
 db.ROLES = ["user", "admin", "moderator"];
 

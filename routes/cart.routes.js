@@ -29,14 +29,20 @@ module.exports = function(app) {
 
   app.get(
     "/api/cart/:userId",
-    //[authJwt.verifyToken],
+    [authJwt.verifyToken],
     controller.getCartByUserId
   );
 
   app.delete(
     "/api/cart/:userId/:productSubtypeId",
-    //[authJwt.verifyToken],
+    [authJwt.verifyToken],
     controller.removeItemFromCart
+  )
+
+  app.delete(
+    "/api/cart/:cartId",
+    [authJwt.verifyToken],
+    controller.emptyCart
   )
 
 };

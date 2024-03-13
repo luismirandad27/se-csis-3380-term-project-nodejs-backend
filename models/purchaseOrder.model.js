@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const ShoppingCartItemSchema = new mongoose.Schema({
+const PurchaseOrderItemSchema = new mongoose.Schema({
     product: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Product",
@@ -28,26 +28,24 @@ const ShoppingCartItemSchema = new mongoose.Schema({
     }
 });
 
-const ShoppingCartSchema = new mongoose.Schema({
+const PurchaseOrderSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true
     },
-    items: [ShoppingCartItemSchema],
+    items: [PurchaseOrderItemSchema],
+    orderStatus: {
+        type: String,
+        enum: ['pending', 'paid', 'shipped', 'delivered'],
+        default: 'pending'
+    },
     createdAt: {
         type: Date,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
-    },
-    sessionId: {
-        type: String
+        default: Date.no
     }
 });
 
-const ShoppingCart = mongoose.model("ShoppingCart", ShoppingCartSchema);
+const PurchaseOrder = mongoose.model("PurchaseOrder", PurchaseOrderSchema);
 
-module.exports = ShoppingCart;
+module.exports = PurchaseOrder;

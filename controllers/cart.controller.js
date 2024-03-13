@@ -174,3 +174,20 @@ exports.removeItemFromCart = async (req, res) => {
   }
 
 };
+
+// REMOVE shopping cart
+exports.emptyCart = async (req, res) => {
+  const {cartId} = req.params;
+
+
+  try {
+
+    await ShoppingCart.findByIdAndDelete(cartId);
+
+    res.status(200).json({message: 'Cart deleted'});
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error retrieving shopping cart');
+  }
+};
