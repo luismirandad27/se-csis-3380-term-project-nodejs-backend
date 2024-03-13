@@ -25,7 +25,7 @@ const ProductSchema =  new mongoose.Schema({
     name: String,
     prod_id: String,
     description: String,
-    product_category: { // Rename
+    product_category: { // Rename 
         type: mongoose.Schema.Types.ObjectId,
         ref: "ProductCategory"
     },

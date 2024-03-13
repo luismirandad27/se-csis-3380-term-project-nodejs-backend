@@ -41,7 +41,7 @@ const UserSchema = new mongoose.Schema({
   ],
   company: String,
   purchaseOrders: [PurchaseOrderSchema],
-  created_at: Date // New field
+  created_at: Date
 });
 
 const User = mongoose.model("User", UserSchema);

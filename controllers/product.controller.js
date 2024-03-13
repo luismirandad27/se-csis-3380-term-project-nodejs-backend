@@ -1,3 +1,14 @@
+/**
+ * product.controller.js
+ * Javascript file that includes the main actions for products.
+ *
+ *
+ * @version 1.0
+ * @author  ???
+ * @updated 2024-02-02
+ *
+*/
+
 const db = require("../models");
 const Product = db.product;
 const ProductCategory = db.productCategory;

@@ -1,5 +1,5 @@
 /**
- * product.routes.js
+ * cart.routes.js
  * Javascript file with the API endpoints for Product administration
  *
  *
@@ -10,7 +10,7 @@
 */
 
 const { authJwt } = require("../middlewares");
-const controller = require("../controllers/product.controller");
+const controller = require("../controllers/cart.controller");
 
 module.exports = function(app) {
   app.use(function(req, res, next) {
@@ -21,16 +21,22 @@ module.exports = function(app) {
     next();
   });
 
-  app.get(
-    "/api/product/:id", 
-    controller.getProductByProdId);
+  app.post(
+    "/api/cart", 
+    [authJwt.verifyToken],    
+    controller.createOrUpdateCart
+  );
 
   app.get(
-      "/api/products", controller.getAllProducts);
+    "/api/cart/:userId",
+    //[authJwt.verifyToken],
+    controller.getCartByUserId
+  );
 
-  app.get(
-    "/api/countries", controller.getUniqueCountries);
- 
+  app.delete(
+    "/api/cart/:userId/:productSubtypeId",
+    //[authJwt.verifyToken],
+    controller.removeItemFromCart
+  )
+
 };
-
-

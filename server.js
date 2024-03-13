@@ -40,6 +40,7 @@ app.use(express.urlencoded({ extended: true }));
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
 require('./routes/product.routes')(app);
+require('./routes/cart.routes')(app);
 
 // Backend port = 8080
 const PORT = process.env.PORT || 8080;
