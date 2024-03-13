@@ -241,8 +241,12 @@ exports.getAllProducts = async (req, res) => {
                     grind_types: 1,
                 }
             },
-            // We opulate necessary references
-            {
+            {//We filter the documents based on whether the product_subtypes array result from previous steps is not empty
+                $match: {
+                    "product_subtypes.0": { $exists: true } 
+                  }
+              },           
+            {// We populate necessary references
                 $lookup: {
                     from: "productcategories",
                     localField: "product_category",
@@ -269,12 +273,6 @@ exports.getAllProducts = async (req, res) => {
             //Unwind necessary arrays, resulted from the lookups. It creates a new document for each element in the array.
             { $unwind: "$product_category" },
             { $unwind: "$import_partner" },
-            {//We filter the documents based on whether the product_subtypes array result from previous steps is not empty
-                $match: {
-                  "product_subtypes.0": { $exists: true } 
-                }
-            },
-            //We unwind the product_subtypes array, we create a new document for each element in the array
             { $unwind: "$product_subtypes" },          
             { //We populate the weight field in product_subtypes with the corresponding data from the weighttypes collection, this is replaced by an array
                 $lookup: {
@@ -284,14 +282,14 @@ exports.getAllProducts = async (req, res) => {
                     as: "product_subtypes.weight"
                 }
             },
-            { //Since we do not want an array, we replace the array with the first element of the array, since we are sure that the array will have only one element
+            { //Since we do not want an array, we replace the array with the first element of the array, because there is only one matching element
                 $addFields: {
                     "product_subtypes.weight": {
                         $arrayElemAt: ["$product_subtypes.weight", 0] 
                     }
                 }
             },
-            {// Given that we have unwound the product_subtypes array, we filter the each document based on the conditions for product_subtypes
+            {// Given that we have unwound the product_subtypes array, we filter each document based on the conditions for product_subtypes
                 $match: subtypeCondition            
                 
             },
@@ -319,6 +317,7 @@ exports.getAllProducts = async (req, res) => {
 
         // Execute the pipeline
         const products = await Product.aggregate(pipeline);
+        products.sort((a, b) => a._id.toString().localeCompare(b._id.toString()));
         res.send(products);
     } catch (err) {
         console.error("Error getting products:", err);
