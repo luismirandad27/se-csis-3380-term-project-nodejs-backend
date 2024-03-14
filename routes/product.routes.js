@@ -30,6 +30,13 @@ module.exports = function(app) {
 
   app.get(
     "/api/countries", controller.getUniqueCountries);
+
+  app.get("/api/productList",
+  //"/api/admin/products",
+   //[authJwt.verifyToken, authJwt.isAdmin], 
+   controller.getProductList);
+
+   app.post("/api/editProduct/:product", controller.updateProduct)
  
 };
 

@@ -77,9 +77,18 @@ exports.getProducts = (req, res) => {
 };
 
 // GET products with Filters
-exports.getAllProducts2 = async (req, res) => {
+exports.getProductList = async (req, res) => {
     const query = req.query;
     let filter = {};
+
+    let { pageSize, page } = getPaginationInfo(query);
+    pageSize = 5;
+
+    //Filtering by prod_id
+    if (query.id) {
+        filter.prod_id = query.id;
+    }
+
 
    // Filtering by Category
    if (query.category) {
@@ -131,7 +140,14 @@ exports.getAllProducts2 = async (req, res) => {
     .populate("product_subtypes.weight")
     .populate("reviews.user")
     .then(products => {
-        res.send(products);
+        const totalPages = Math.ceil(products.length / pageSize);
+        const paginatedProducts = products.slice((page - 1) * pageSize, page * pageSize);
+        res.json({
+            totalPages,
+            page,
+            products: paginatedProducts,
+        });
+        // res.send(products);
     })
     .catch(err => {
         console.error("Error getting products:", err);
@@ -380,3 +396,27 @@ exports.getAllProducts = async (req, res) => {
 
 
 
+exports.updateProduct = async (req, res) => {
+    const {  product, indexSubtype } = req.body;//userId
+    try {
+        const productInDb = await Product
+            .findById(product._id)
+            
+        if (!productInDb) {
+            return res.status(404).send('Product not found');
+        }
+
+        // Check if the user is an admin 
+
+        //We update the stock and of the product subtype
+        productInDb.product_subtypes[indexSubtype].stock = product.product_subtypes[indexSubtype].stock;
+        productInDb.product_subtypes[indexSubtype].price = product.product_subtypes[indexSubtype].price;
+        await productInDb.save();
+        res.status(200).json(productInDb);
+    
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error updating product');
+    }
+};
