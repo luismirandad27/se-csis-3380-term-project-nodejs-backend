@@ -24,8 +24,7 @@ db.inquiry = require("./inquiry.model");
 db.productCategory = require("./productCategory.model");
 db.product = require("./product.model");
 db.weightType = require("./weightType.model");
-db.shoppingCart = require("./shoppingCart.model");
 
-db.ROLES = ["user", "admin", "moderator"];
+db.ROLES = ["user", "admin"];
 
 module.exports = db;

@@ -1,47 +1,113 @@
 const mongoose = require("mongoose");
 
 const TrackingLogSchema = new mongoose.Schema({
-  status: String,
-  log_date: Date,
-  description: String
-})
-
-const PaymentSchema = new mongoose.Schema({
-  quantity: Number,
-  price: Number
+    status: String,
+    log_date: Date,
+    description: String
 })
 
 const OrderDetailSchema = new mongoose.Schema({
-  payment_date: Date,
-  payment_intent_id: Number,
-  amount: Number
+    product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+        required: true
+    },
+    product_subtype: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product.product_subtype", // Reference to the Product Subtype
+        required: true
+    },
+    grind_type: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "GrindType", // Reference to the Grind Type
+        required: true
+    },
+    quantity: {
+        type: Number,
+        required: true,
+        min: 1
+    },
+    unit_price: {
+        type: Number,
+        required: true,
+        min: 1
+    }
 })
-
 
 const PurchaseOrderSchema = new mongoose.Schema({
-  order_date: Date,
-  total_amount: Number,
-  order_details:[OrderDetailSchema],
-  payment: PaymentSchema,
-  trackingLog: [TrackingLogSchema]
+    items: [OrderDetailSchema],
+    order_status: {
+        type: String,
+        enum: ['pending', 'paid', 'shipped', 'delivered'],
+        default: 'pending'
+    },
+    created_at: {
+        type: Date,
+        default: Date.no
+    },
+    stripe_session_id: {
+        type: String
+    }
 })
 
-const UserSchema = new mongoose.Schema({
-  username: String,
-  email: String,
-  password: String,
-  address: String,
-  phone: String,
-  gender: String, // New field
-  roles: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Role"
+const ShoppingCartItemSchema = new mongoose.Schema({
+    product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+        required: true
+    },
+    product_subtype: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product.product_subtype", // Reference to the Product Subtype
+        required: true
+    },
+    grind_type: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "GrindType", // Reference to the Grind Type
+        required: true
+    },
+    quantity: {
+        type: Number,
+        required: true,
+        min: 1
+    },
+    unit_price: {
+        type: Number,
+        required: true,
+        min: 1
     }
-  ],
-  company: String,
-  purchaseOrders: [PurchaseOrderSchema],
-  created_at: Date
+});
+
+const ShoppingCartSchema = new mongoose.Schema({
+    items: [ShoppingCartItemSchema],
+    created_at: {
+        type: Date,
+        default: Date.now
+    },
+    updated_at: {
+        type: Date,
+        default: Date.now
+    },
+    stripe_session_id: {
+        type: String
+    }
+});
+
+const UserSchema = new mongoose.Schema({
+    username: String,
+    email: String,
+    password: String,
+    address: String,
+    phone: String,
+    gender: String,
+    roles: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Role"
+    }],
+    company: String,
+    shopping_cart: ShoppingCartSchema,
+    purchase_orders: [PurchaseOrderSchema],
+    created_at: Date
 });
 
 const User = mongoose.model("User", UserSchema);
