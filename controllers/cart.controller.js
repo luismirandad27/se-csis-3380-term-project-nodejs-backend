@@ -1,17 +1,17 @@
 /**
  * cart.controller.js
- * Javascript file that includes the main actions for products.
+ * Javascript file that includes the main actions for shopping carts.
  *
  *
  * @version 1.0
- * @author  Luis Miranda
+ * @author  Luis Miguel Miranda
  * @updated 2024-02-04
  *
 */
 
 const db = require("../models");
 const Product = db.product;
-const ShoppingCart = db.shoppingCart;
+const User = db.user;
 
 // ADD product to cart
 exports.createOrUpdateCart = async (req, res) => {
@@ -24,13 +24,20 @@ exports.createOrUpdateCart = async (req, res) => {
 
     try {
       
+      // Search the user
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(404).send({message: 'User not found'});
+      }
+
       // Validate if the product exists and has stock
       const productInDb = await Product
         .findOne({prod_id : product.id})
         .populate('product_subtypes');
 
       if (!productInDb) {
-        return res.status(404).send('Product not found');
+        return res.status(404).send({message:'Product not found'});
       }
 
       const productInDbId = productInDb._id.toString();
@@ -38,85 +45,98 @@ exports.createOrUpdateCart = async (req, res) => {
       const productSubtype = productInDb.product_subtypes.find(subtype => subtype.weight.toString() === product.subtypeIdentifier);
 
       if (!productSubtype) {
-        return res.status(404).send('Product subtype not found');
+        return res.status(404).send({message:'Product subtype not found'});
       }
 
       if (productSubtype.stock < parseInt(product.quantity)) {
-        return res.status(400).send('Not enough stock');
+        return res.status(400).send({message:'Not enough stock'});
       }
+      
+      let cart = user.shopping_cart || {created_at: new Date(), sessionId: null, updated_at: null, items: [] };
 
-      // Finding the user's cart, if it exists
-      let cart = await ShoppingCart.findOne({ user: userId });
-  
-      if (cart) {
+      const itemIndex = cart.items.findIndex(item => item.product.toString() === productInDbId && item.grind_type.toString() === product.grindType && item.product_subtype.toString() === product.subtypeIdentifier);
 
-        // User already has a cart, update it, retrieve the index of the product in the cart
-        const itemIndex = cart.items.findIndex(item => item.product.toString() === productInDbId && item.grindType.toString() === product.grindType && item.productSubtype.toString() === product.subtypeIdentifier);
+      if (itemIndex > -1) {
+        
+        cart.items[itemIndex].quantity += parseInt(product.quantity);
+        cart.updated_at = new Date();
 
-        if (itemIndex > -1) {
-
-          // This means that the product has been added before
-          cart.items[itemIndex].quantity += parseInt(product.quantity);
-
-        } else {
-
-          // Add new product to cart
-          cart.items.push({
-            product: productInDbId,
-            productSubtype: product.subtypeIdentifier,
-            grindType: product.grindType,
-            quantity: parseInt(product.quantity),
-            unitPrice: parseInt(product.price)
-          });
-
-        }
       } else {
 
-        console.log('car does not exist');
-
-        // No cart for user, create a new one
-        cart = new ShoppingCart({
-          user: userId,
-          items: [{
-            product: productInDbId,
-            productSubtype: product.subtypeIdentifier,
-            grindType: product.grindType,
-            quantity: parseInt(product.quantity),
-            unitPrice: parseInt(product.price)
-          }]
+        cart.items.push({
+          product: productInDbId,
+          product_subtype: product.subtypeIdentifier,
+          grind_type: product.grindType,
+          quantity: parseInt(product.quantity),
+          unit_price: parseInt(product.price)
         });
+
+        cart.updated_at = new Date();
+
       }
+
+      // Since the cart is embedded, we update the user's cart directly
+      user.shopping_cart = cart;
 
       // Update stock of the product
       productSubtype.stock -= parseInt(product.quantity);
       await productInDb.save();
       
       // Save the cart
-      await cart.save();
+      await user.save();
 
-      res.status(200).json(cart);
+      res.status(200).json(user);
 
     } catch (error) {
       console.error(error);
       res.status(500).send('Error creating or updating shopping cart');
     }
+
   };
 
 // GET user's cart
 exports.getCartByUserId = async (req, res) => {
   const { userId } = req.params;
+  
   try {
 
-    // Get the ShoppingCart for the user including the items
-    const cart = await ShoppingCart.findOne({user: userId})
-                                    .populate('items.product')
-                                    .populate('items.grindType')
-                                    .populate({
-                                        path: 'items.productSubtype',
-                                        model: 'WeightType'
-                                    });
+    // Get user information
+    const user = await User
+                      .findById(userId)
+                      .populate({
+                        path: 'shopping_cart',
+                        populate: {
+                          path: 'items.product',
+                          model: 'Product',
+                          select: 'name',
+                          // Populate product_subtypes within each product
+                          populate: {
+                            path: 'product_subtypes',
+                            model: 'ProductSubtype' // Assuming this is your model name for product subtypes
+                          },
+                          select: 'name product_subtypes'
+                        }
+                      })
+                      .populate({
+                        path: 'shopping_cart',
+                        populate: {
+                          path: 'items.grind_type',
+                          model: 'GrindType'
+                        }
+                      })
+                      .populate({
+                        path: 'shopping_cart',
+                        populate: {
+                          path: 'items.product_subtype',
+                          model: 'WeightType'
+                        }
+                      });
 
-    res.status(200).json(cart);
+    if (!user) {
+      return res.status(404).send({message:'User not found'});
+    }
+
+    res.status(200).json(user.shopping_cart);
 
   } catch (error) {
     console.error(error);
@@ -126,23 +146,28 @@ exports.getCartByUserId = async (req, res) => {
 
 // REMOVE item from cart
 exports.removeItemFromCart = async (req, res) => {
+  
   const { userId, productSubtypeId } = req.params;
   
   try {
 
-    // Get the ShoppingCart for the user 
-    const cart = await ShoppingCart.findOne({user: userId});
+    // Get the user information
+    const user = await User.findById(userId);
+
+    if (!user || !user.shopping_cart || user.shopping_cart.items.length === 0) {
+      return res.status(404).send('User not found or shopping cart is empty');
+    }
 
     // Find the item (index) in the cart, where productSubType is the same as the one to be removed
-    const itemIndexRemoved = cart.items.findIndex(item => item.productSubtype.toString() === productSubtypeId);
+    const itemIndexRemoved = user.shopping_cart.items.findIndex(item => item.product_subtype.toString() === productSubtypeId);
 
     // Store the quantity we are removing
-    const productId = cart.items[itemIndexRemoved].product.toString();
-    const quantityRemoved = parseInt(cart.items[itemIndexRemoved].quantity);
+    const productId = user.shopping_cart.items[itemIndexRemoved].product.toString();
+    const quantityRemoved = parseInt(user.shopping_cart.items[itemIndexRemoved].quantity);
 
     // Remove the item
     if (itemIndexRemoved > -1) {
-      cart.items.splice(itemIndexRemoved, 1);
+      user.shopping_cart.items.splice(itemIndexRemoved, 1);
     }
     else{
       return res.status(400).send('Item not found in cart');
@@ -153,24 +178,51 @@ exports.removeItemFromCart = async (req, res) => {
     const productSubtypeIndex = selectedProduct.product_subtypes.findIndex(subtype => subtype.weight._id.toString() === productSubtypeId);
     selectedProduct.product_subtypes[productSubtypeIndex].stock += quantityRemoved;
     
+    let updatedUser;
+
     // If the cart is empty let's remove it
-    if (cart.items.length === 0)
+    if (user.shopping_cart.items.length === 0)
     {
-      await ShoppingCart.findByIdAndDelete(cart._id);
+      updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { $unset: { shopping_cart: "" } },
+        { new: true }
+      );
       
     }else
     {
-      await cart.save();
+     updatedUser = await user.save();
     }
 
     // Update the stock in the database
     await selectedProduct.save();
 
-    res.status(200).json(cart);
+    res.status(200).json(updatedUser);
 
   } catch (error) {
     console.error(error);
     res.status(500).send('Error retrieving shopping cart');
   }
 
+};
+
+// REMOVE shopping cart
+exports.emptyCart = async (req, res) => {
+  
+  const {userId} = req.params;
+
+  try {
+
+    updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $unset: { shopping_cart: "" } },
+      { new: true }
+    );
+
+    res.status(200).json({message: 'Cart deleted'});
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error retrieving shopping cart');
+  }
 };

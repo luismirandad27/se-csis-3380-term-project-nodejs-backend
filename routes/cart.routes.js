@@ -1,6 +1,6 @@
 /**
  * cart.routes.js
- * Javascript file with the API endpoints for Product administration
+ * Javascript file with the API endpoints for Shopping Cart administration
  *
  *
  * @version 1.0
@@ -29,14 +29,20 @@ module.exports = function(app) {
 
   app.get(
     "/api/cart/:userId",
-    //[authJwt.verifyToken],
+    [authJwt.verifyToken],
     controller.getCartByUserId
   );
 
   app.delete(
     "/api/cart/:userId/:productSubtypeId",
-    //[authJwt.verifyToken],
+    [authJwt.verifyToken],
     controller.removeItemFromCart
+  )
+
+  app.delete(
+    "/api/cart/:cartId",
+    [authJwt.verifyToken],
+    controller.emptyCart
   )
 
 };
