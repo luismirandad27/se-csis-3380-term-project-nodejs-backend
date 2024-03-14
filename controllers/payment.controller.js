@@ -1,34 +1,41 @@
 /**
- * product.controller.js
- * Javascript file that includes the main actions for products.
+ * payment.controller.js
+ * Javascript file that includes the main actions for payments.
  *
  *
  * @version 1.0
- * @author  ???
+ * @author  Luis Miguel Miranda
  * @updated 2024-02-02
  *
 */
 
 const db = require("../models");
 const ShoppingCart = db.shoppingCart;
+const User  = db.user;
 
 // Function to generate the Stripe payment intent
 exports.generateStripeCheckout = async (req, res) => {
     
     const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-    const { items } = req.body;
+    const { items, userId } = req.body;
 
     try {
         
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
         const lineItems = items.map(item => {
             return {
                 price_data: {
                     currency: 'usd',
                     product_data: {
-                        name: item.product.name + " (" + item.grindType.name + ") " + item.productSubtype.name
+                        name: item.product.name + " (" + item.grind_type.name + ") " + item.product_subtype.name
                     },
-                    unit_amount: item.unitPrice,
+                    unit_amount: item.unit_price,
                 },
                 quantity: item.quantity,
             };
@@ -40,9 +47,13 @@ exports.generateStripeCheckout = async (req, res) => {
             mode: 'payment',
             success_url: `${process.env.FRONTEND_URL}/checkout-success`,
             cancel_url: `${process.env.FRONTEND_URL}/checkout-cancel`,
+            metadata: {
+                user_id: userId,
+                user_email: user.email
+            }
         });
 
-        res.json({ sessionId: session.id });
+        res.json({ stripe_session_id: session.id });
 
     } catch (err) {
         console.error("Error generating payment intent:", err);
@@ -67,21 +78,22 @@ exports.fetchStripeSession = async (req, res) => {
 
 exports.addSessionIdShoppingCart = async (req, res) => {
     
-    const { sessionId} = req.body;
-    const { cartId } = req.params;
+    const { userId, sessionId} = req.body;
     
     try {
         
-        const cart = await ShoppingCart.findOneAndUpdate(
-            { _id: cartId },
-            { sessionId: sessionId },
-            { new: true }
-        );
+        const user = await User.findById(userId);
+        
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+        
+        user.shopping_cart.updated_at = Date.now();
+        user.shopping_cart.stripe_session_id = sessionId;
 
-        cart.updatedAt = Date.now();
-        await cart.save();
+        await user.save();
 
-        res.status(200).json(cart);
+        res.status(200).json(user);
 
     } catch (error) {
         

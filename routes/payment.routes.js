@@ -34,7 +34,7 @@ module.exports = function(app) {
   );
 
   app.post(
-    "/api/update-session-id-shopping-cart/:cartId",
+    "/api/update-session-id-shopping-cart",
     [authJwt.verifyToken],
     controller.addSessionIdShoppingCart
   )

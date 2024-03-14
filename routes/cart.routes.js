@@ -1,6 +1,6 @@
 /**
  * cart.routes.js
- * Javascript file with the API endpoints for Product administration
+ * Javascript file with the API endpoints for Shopping Cart administration
  *
  *
  * @version 1.0
