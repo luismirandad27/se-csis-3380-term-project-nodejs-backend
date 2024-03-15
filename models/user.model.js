@@ -28,7 +28,7 @@ const OrderDetailSchema = new mongoose.Schema({
         min: 1
     },
     unit_price: {
-        type: mongoose.Types.Decimal128,
+        type: Number,
         required: true,
         min: 1
     }
@@ -72,7 +72,7 @@ const ShoppingCartItemSchema = new mongoose.Schema({
         min: 1
     },
     unit_price: {
-        type: mongoose.Types.Decimal128,
+        type: Number,
         required: true,
         min: 1
     }
