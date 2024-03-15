@@ -12,7 +12,7 @@ const ReviewSchema = new mongoose.Schema({
 });
 
 const ProductSubtypeSchema = new mongoose.Schema({
-    price: Number, 
+    price: mongoose.Types.Decimal128, 
     stock: Number, 
     image_url: String,
     weight: {
@@ -25,7 +25,7 @@ const ProductSchema =  new mongoose.Schema({
     name: String,
     prod_id: String,
     description: String,
-    product_category: { // Rename 
+    product_category: { 
         type: mongoose.Schema.Types.ObjectId,
         ref: "ProductCategory"
     },
@@ -36,11 +36,11 @@ const ProductSchema =  new mongoose.Schema({
     producer: String,
     region: String,
     process: String,
-    import_partner: { // Rename
+    import_partner: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "ImportPartner"
     },
-    product_subtypes: [ProductSubtypeSchema], // Rename
+    product_subtypes: [ProductSubtypeSchema],
     grind_types: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "GrindType"
@@ -51,4 +51,3 @@ const ProductSchema =  new mongoose.Schema({
 const Product = mongoose.model("Product", ProductSchema);
 
 module.exports = Product;
-

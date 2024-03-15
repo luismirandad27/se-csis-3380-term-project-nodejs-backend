@@ -28,7 +28,7 @@ const OrderDetailSchema = new mongoose.Schema({
         min: 1
     },
     unit_price: {
-        type: Number,
+        type: mongoose.Types.Decimal128,
         required: true,
         min: 1
     }
@@ -43,7 +43,7 @@ const PurchaseOrderSchema = new mongoose.Schema({
     },
     created_at: {
         type: Date,
-        default: Date.no
+        default: Date.now
     },
     stripe_session_id: {
         type: String
@@ -72,7 +72,7 @@ const ShoppingCartItemSchema = new mongoose.Schema({
         min: 1
     },
     unit_price: {
-        type: Number,
+        type: mongoose.Types.Decimal128,
         required: true,
         min: 1
     }

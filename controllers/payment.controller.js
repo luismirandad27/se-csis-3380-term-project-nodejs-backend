@@ -35,7 +35,7 @@ exports.generateStripeCheckout = async (req, res) => {
                     product_data: {
                         name: item.product.name + " (" + item.grind_type.name + ") " + item.product_subtype.name
                     },
-                    unit_amount: item.unit_price,
+                    unit_amount: parseInt(item.unit_price.$numberDecimal * 100),
                 },
                 quantity: item.quantity,
             };

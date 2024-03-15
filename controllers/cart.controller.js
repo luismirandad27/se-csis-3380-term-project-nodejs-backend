@@ -68,7 +68,7 @@ exports.createOrUpdateCart = async (req, res) => {
           product_subtype: product.subtypeIdentifier,
           grind_type: product.grindType,
           quantity: parseInt(product.quantity),
-          unit_price: parseInt(product.price)
+          unit_price: product.price
         });
 
         cart.updated_at = new Date();
@@ -109,10 +109,9 @@ exports.getCartByUserId = async (req, res) => {
                           path: 'items.product',
                           model: 'Product',
                           select: 'name',
-                          // Populate product_subtypes within each product
                           populate: {
                             path: 'product_subtypes',
-                            model: 'ProductSubtype' // Assuming this is your model name for product subtypes
+                            model: 'ProductSubtype'
                           },
                           select: 'name product_subtypes'
                         }
