@@ -76,83 +76,45 @@ exports.getProducts = (req, res) => {
     });
 };
 
-// GET products with Filters
+// GET products List
 exports.getProductList = async (req, res) => {
     const query = req.query;
     let filter = {};
+    const page = parseInt(query.page) || 1;
+    const pageSize = 5;
 
-    let { pageSize, page } = getPaginationInfo(query);
-    pageSize = 5;
-
-    //Filtering by prod_id
+    // Filtering by prod_id
     if (query.id) {
-        filter.prod_id = query.id;
+        filter.prod_id = {$regex: '.*' + query.id + '.*', $options: 'i'}; // Case insensitive
     }
 
+    try {
+        // Use countDocuments to get the total count based on the filter
+        const totalCount = await Product.countDocuments(filter);
 
-   // Filtering by Category
-   if (query.category) {
-        const categoryNames = query.category.split(','); // Split the category string into an array of category names
-        const categoryObjectIds = await ProductCategory.find({ 
-            name: { $in: categoryNames }
-        }).select('_id');  //This returns an array of Objects:documents in the ProductCategory collection where the name field matches any of the strings in the categoryNames array and returns only the _id property
+        // Calculate total pages
+        const totalPages = Math.ceil(totalCount / pageSize);
 
-        filter.product_category = { $in: categoryObjectIds.map(cat => cat._id) };//From each object we extract the _id 
-        //The product_category must match any of the ids extracted from the categoryObjectIds array
-    }
+        // Fetch paginated products with all necessary populations
+        const products = await Product.find(filter)
+            .populate("product_category")
+            .populate("import_partner")
+            .populate("grind_types")
+            .populate("product_subtypes.weight")
+            .populate("reviews.user")
+            .skip((page - 1) * pageSize)
+            .limit(pageSize);
 
-    // Filtering by weight
-    if (query.weight) {
-        const weightValue = query.weight;
-        const weightObjectIds = await WeightType.find({
-            name: weightValue
-        }).select('_id');
-        filter["product_subtypes.weight"] = weightObjectIds;
-    }
-
-    //Filtering by price range
-    if (query.min){
-        filter["product_subtypes.price"] = { $gte: query.min };
-    }
-
-    if(query.max) {
-        filter["product_subtypes.price"] = { $lte: query.max };
-    }
-
-    //Filtering by country
-    if (query.country) {
-        filter.countries_origin = query.country;
-    }
-
-    //Filtering by grind
-    if (query.grind) {
-        const grindNames = query.grind.split(',');
-        const grindObjectIds = await GrindType.find({
-            name: { $in: grindNames }
-        }).select('_id');
-        filter.grind_types = { $in: grindObjectIds.map(grind => grind._id) };
-    }
-        
-    Product.find(filter)
-    .populate("product_category")
-    .populate("import_partner")
-    .populate("grind_types")
-    .populate("product_subtypes.weight")
-    .populate("reviews.user")
-    .then(products => {
-        const totalPages = Math.ceil(products.length / pageSize);
-        const paginatedProducts = products.slice((page - 1) * pageSize, page * pageSize);
+        // Send the response with total pages, current page, and the paginated products
         res.json({
             totalPages,
             page,
-            products: paginatedProducts,
+            products,
         });
-        // res.send(products);
-    })
-    .catch(err => {
+    } catch (err) {
         console.error("Error getting products:", err);
         res.status(500).send({ message: err });
-    });
+    }
 };
 
 
@@ -171,6 +133,47 @@ exports.getUniqueCountries = (req, res) => {
     });
 };
 
+// Get categories
+exports.getCategories = (req, res) => {
+    ProductCategory.find()
+    .then(categories => {
+        if (categories.length === 0 ) {
+            return res.status(404).send({ message: "No categories found." });
+        }
+        res.send(categories.map(cat => cat.name));
+    })
+    .catch(err => {
+        console.error("Error getting categories:", err);
+        res.status(500).send({ message: err });
+    });
+
+}
+
+// Get grind types
+exports.getGrindTypes = (req, res) => {
+    GrindType.find()
+    .then(grinds => {
+        if (grinds.length === 0 ) {
+            return res.status(404).send({ message: "No grind types found." });
+        }
+        res.send(grinds.map(grind => grind.name));
+    })
+    .catch(err => {
+        console.error("Error getting grind types:", err);
+        res.status(500).send({ message: err });
+    });
+}
+
+// Get weights
+exports.getWeights = (req, res) => {
+    WeightType.find()
+    .then(weights => {
+        if (weights.length === 0 ) {
+            return res.status(404).send({ message: "No weights found." });
+        }
+        res.send(weights.map(weight => weight.name));
+    });
+}
 
 const getPaginationInfo = (query) => {
     const pageSize = 9;
@@ -300,7 +303,7 @@ const getPipeline = (generalCondition, subtypeCondition, sortCondition) => {
                 as: "import_partner"
             }
         },
-        //Unwind necessary arrays, resulted from the lookups. It creates a new document for each element in the array.
+        //Unwind necessary arrays, It creates a new document for each element in the array.
         { $unwind: "$product_subtypes" },          
         { //We populate the weight field in product_subtypes with the corresponding data from the weighttypes collection, this is replaced by an array
             $lookup: {
@@ -395,7 +398,7 @@ exports.getAllProducts = async (req, res) => {
 };
 
 
-
+//Update product stock and price
 exports.updateProduct = async (req, res) => {
     const {  product, indexSubtype } = req.body;//userId
     try {
@@ -413,8 +416,6 @@ exports.updateProduct = async (req, res) => {
         productInDb.product_subtypes[indexSubtype].price = product.product_subtypes[indexSubtype].price;
         await productInDb.save();
         res.status(200).json(productInDb);
-    
-
     } catch (error) {
         console.error(error);
         res.status(500).send('Error updating product');

@@ -31,6 +31,15 @@ module.exports = function(app) {
   app.get(
     "/api/countries", controller.getUniqueCountries);
 
+  app.get(
+    "/api/categories", controller.getCategories);
+
+  app.get(
+    "/api/grindTypes", controller.getGrindTypes);
+
+  app.get(
+      "/api/weights", controller.getWeights);
+
   app.get("/api/productList",
   //"/api/admin/products",
    //[authJwt.verifyToken, authJwt.isAdmin], 
