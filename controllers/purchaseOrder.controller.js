@@ -15,7 +15,6 @@ const User = db.user;
 // Function to generate the Stripe payment intent
 exports.savePurchaseOrder = async (req, res) => {
     
-    
     const { order,userId } = req.body;
     
     try {
@@ -53,3 +52,54 @@ exports.savePurchaseOrder = async (req, res) => {
         res.status(500).send({ message: err });
     }
 };
+
+// Function to obtain the Purchase Order based on an Id
+exports.getPurchaseOrder = async(req, res) => {
+
+    const { userId, orderId } = req.params;
+
+    try{
+
+        const user = await User
+                          .findById(userId)
+                          .populate({
+                            path: 'purchase_orders',
+                            populate: {
+                              path: 'items.product',
+                              model: 'Product',
+                              select: 'name',
+                              populate: {
+                                path: 'product_subtypes',
+                                model: 'ProductSubtype'
+                              },
+                              select: 'name product_subtypes'
+                            }
+                          })
+                          .populate({
+                            path: 'purchase_orders',
+                            populate: {
+                              path: 'items.grind_type',
+                              model: 'GrindType'
+                            }
+                          })
+                          .populate({
+                            path: 'purchase_orders',
+                            populate: {
+                              path: 'items.product_subtype',
+                              model: 'WeightType'
+                            }
+                          });
+
+        if (!user) {
+            return res.status(404).send({ message: "User not found" });
+        }
+
+        return res.status(200).json(user.purchase_orders);
+    }
+    catch(err){
+        console.error("Error getting purchase order:", err);
+        res.status(500).send({ message: err });
+    }
+
+
+}
