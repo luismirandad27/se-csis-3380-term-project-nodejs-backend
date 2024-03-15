@@ -107,7 +107,11 @@ const UserSchema = new mongoose.Schema({
     company: String,
     shopping_cart: ShoppingCartSchema,
     purchase_orders: [PurchaseOrderSchema],
-    created_at: Date
+    created_at: Date,
+    deletedAt: {
+        type: Date,
+        default: null
+    }
 });
 
 const User = mongoose.model("User", UserSchema);
