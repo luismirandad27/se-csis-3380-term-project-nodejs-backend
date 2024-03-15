@@ -36,7 +36,7 @@ module.exports = function(app) {
    //[authJwt.verifyToken, authJwt.isAdmin], 
    controller.getProductList);
 
-   app.post("/api/editProduct/:product", controller.updateProduct)
+   app.put("/api/editProduct/:product", controller.updateProduct)
  
 };
 
