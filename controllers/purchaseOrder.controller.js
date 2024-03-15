@@ -44,8 +44,38 @@ exports.savePurchaseOrder = async (req, res) => {
             { $unset: { shopping_cart: "" } },
             { new: true }
           );
-        
-        res.status(200).json(newOrder);
+
+        const userUpdateOrder = await User
+          .findById(userId)
+          .populate({
+            path: 'purchase_orders',
+            populate: {
+              path: 'items.product',
+              model: 'Product',
+              select: 'name',
+              populate: {
+                path: 'product_subtypes',
+                model: 'ProductSubtype'
+              },
+              select: 'name product_subtypes'
+            }
+          })
+          .populate({
+            path: 'purchase_orders',
+            populate: {
+              path: 'items.grind_type',
+              model: 'GrindType'
+            }
+          })
+          .populate({
+            path: 'purchase_orders',
+            populate: {
+              path: 'items.product_subtype',
+              model: 'WeightType'
+            }
+          });
+
+        res.status(200).json(userUpdateOrder.purchase_orders[userUpdateOrder.purchase_orders.length - 1]);
 
     } catch (err) {
         console.error("Error generating order:", err);
@@ -94,7 +124,14 @@ exports.getPurchaseOrder = async(req, res) => {
             return res.status(404).send({ message: "User not found" });
         }
 
-        return res.status(200).json(user.purchase_orders);
+        // Find the purchase order from the purchase_orders array where _id is equal to orderId
+        const purchaseOrder = user.purchase_orders.find(order => order._id == orderId);
+
+        if (!purchaseOrder) {
+            return res.status(404).send({ message: "Purchase Order not found" });
+        }
+
+        return res.status(200).json(purchaseOrder);
     }
     catch(err){
         console.error("Error getting purchase order:", err);

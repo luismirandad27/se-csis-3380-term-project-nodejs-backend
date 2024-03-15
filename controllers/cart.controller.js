@@ -68,7 +68,7 @@ exports.createOrUpdateCart = async (req, res) => {
           product_subtype: product.subtypeIdentifier,
           grind_type: product.grindType,
           quantity: parseInt(product.quantity),
-          unit_price: parseInt(product.price)
+          unit_price: product.price
         });
 
         cart.updated_at = new Date();
