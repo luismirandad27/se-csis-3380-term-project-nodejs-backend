@@ -27,5 +27,11 @@ module.exports = function(app) {
     controller.savePurchaseOrder
   );
 
+  app.get(
+    "/api/orders/:userId/:orderId", 
+    [authJwt.verifyToken],    
+    controller.getPurchaseOrder
+  );
+
 
 };
