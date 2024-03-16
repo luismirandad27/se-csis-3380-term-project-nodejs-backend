@@ -28,15 +28,15 @@ module.exports = function(app) {
     controller.getUsers
   );
 
-  //GET users by ID
+  //GET user by ID
   app.get(
-    "/api/getUser/:userId",
+    "/api/users/:userId",
     // [authJwt.verifyToken, authJwt.isAdmin],
     controller.getUserById
   );
 
   //Inactivate user
-  app.put("/api/users/:userId", 
+  app.put("/api/inactivate/:userId", 
   // [authJwt.verifyToken, authJwt.isAdmin],
   controller.inactivateUser)
  
@@ -45,5 +45,8 @@ module.exports = function(app) {
    // [authJwt.verifyToken, authJwt.isAdmin],
   controller.changePassword);
 
-  //
+  //Update User
+  app.put("/api/update/:userId",
+  // [authJwt.verifyToken, authJwt.isAdmin],
+  controller.updateUser);
 };
