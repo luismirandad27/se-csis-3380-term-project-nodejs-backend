@@ -8,10 +8,12 @@
  * @updated 2024-03-16
  *
 */
+const mongoose = require('mongoose');
 var bcrypt = require("bcryptjs");
 const db = require("../models");
 const User = db.user;
 const Role = db.role;
+const Product = db.product;
 
 exports.allAccess = (req, res) => {
     res.status(200).send("Public Content.");
@@ -101,7 +103,7 @@ exports.getUserById = async (req, res) => {
     } catch (err) {
         res.status(500).send({ message: err.message });
     }
-};
+}
 
 // Update user information
 exports.updateUser = async(req, res) =>{
@@ -160,7 +162,7 @@ exports.updateUser = async(req, res) =>{
         res.status(500).send({ message: "User could not be updated: " + err.message });
     }
 
-};
+}
 
 // Function to add a user review to a product
 exports.addUserReview = async (req, res) => {
@@ -203,3 +205,93 @@ exports.addUserReview = async (req, res) => {
     }
 
 }
+
+//Get all reviews by User Id
+exports.getReviewsByUser = async(req, res) =>{
+    const userId = req.params.userId;
+    try{
+        //Retrieve all products with specific fields
+        const products = await Product.find({}, { _id: 1, name: 1, prod_id: 1, reviews: 1 });
+
+        //Filter reviews array by userID
+        let reviewsByUser = products.map(product => {
+            let productWithFilteredReviews = {
+                ...product._doc,
+                reviews: product.reviews.filter(review => review.user.toString() === userId)
+            }
+
+            return productWithFilteredReviews;
+        });
+
+        //filter products shown based on the length of the filtered reviews array
+        reviewsByUser = reviewsByUser.filter(prod => prod.reviews.length>0);
+        
+        res.status(200).send(reviewsByUser);
+    }catch(err){
+        res.status(500).send({ message: err.message });   
+    }
+}
+
+//Edit a Review
+exports.editUserReview = async(req, res)=>{
+    const userId = req.params.userId; 
+    const { productId, title, comment, rating } = req.body; 
+
+    try {
+        const product = await Product.findById(productId);
+        
+        if(!product){
+            return res.status(404).send({ message: 'Product not found' });
+        }
+
+        const reviewIndex = product.reviews.findIndex(review => review.user.toString() === userId);
+
+        if (reviewIndex === -1) {
+            return res.status(404).send({ message: 'Review not found' });
+        }
+
+        product.reviews[reviewIndex].title = title;
+        product.reviews[reviewIndex].comment = comment;
+        product.reviews[reviewIndex].rating = rating;
+ 
+    // Save the product document with the updated review
+      await product.save();
+        
+    res.status(200).send({ message: 'Review updated successfully', review:  product.reviews[reviewIndex] });
+
+    } catch (error) {
+        res.status(500).send({ message: 'An error occurred', error: error.toString() });
+    }
+
+}
+
+//Delete a Review
+exports.deleteUserReview = async(req, res)=>{
+    const userId = req.params.userId; 
+    const { productId} = req.body; 
+
+    try {
+        const product = await Product.findById(productId);
+        
+        if(!product){
+           return res.status(404).send({ message: 'Product not found' });
+        }
+
+        const reviewIndex = product.reviews.findIndex(review => review.user.toString() === userId);
+
+        if (reviewIndex === -1) {
+            return res.status(404).send({ message: 'Review not found' });
+        }
+
+        product.reviews.splice(reviewIndex, 1);
+ 
+        await product.save();
+        
+        res.status(200).send({ message: 'Review deleted successfully' });
+
+    } catch (error) {
+        res.status(500).send({ message: 'An error occurred', error: error.toString() });
+    }
+
+}
+
