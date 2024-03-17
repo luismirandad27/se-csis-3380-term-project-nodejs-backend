@@ -22,7 +22,12 @@ exports.signup = (req, res) => {
     username: req.body.username,
     email: req.body.email,
     password: bcrypt.hashSync(req.body.password, 8),
+    address: req.body.address,
+    phone: req.body.phone,
+    gender: req.body.gender,
+    company: req.body.company,
     created_at: new Date()
+
   });
 
   user.save()
@@ -56,12 +61,17 @@ exports.signin = async (req, res) => {
     if (!user) {
       return res.status(404).send({ message: "User Not found." });
     }
+
+    const isInactive = await User.findOne({ username: req.body.username }).select("deletedAt");
+    if (isInactive && isInactive.deletedAt){
+      return res.status(400).send({ accessToken: null, message: "User account is not active!" });
+    }
   
     const passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
     if (!passwordIsValid) {
       return res.status(401).send({ accessToken: null, message: "Invalid Password!" });
     }
-  
+
     const token = jwt.sign({ id: user.id }, config.secret, {
       algorithm: 'HS256',
       allowInsecureKeySizes: true,

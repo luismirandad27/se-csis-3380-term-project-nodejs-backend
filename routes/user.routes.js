@@ -20,5 +20,33 @@ module.exports = function(app) {
     );
     next();
   });
+
+  // GET all users
+  app.get(
+    "/api/users",
+    [authJwt.verifyToken, authJwt.isAdmin],
+    controller.getUsers
+  );
+
+  //GET user by ID
+  app.get(
+    "/api/users/:userId",
+    [authJwt.verifyToken, authJwt.isAdmin],
+    controller.getUserById
+  );
+
+  //Inactivate user
+  app.put("/api/inactivate/:userId", 
+  [authJwt.verifyToken, authJwt.isAdmin],
+  controller.inactivateUser)
  
+  //Change Password
+  app.put("/api/changePassword/:userId",
+  [authJwt.verifyToken, authJwt.isAdmin],
+  controller.changePassword);
+
+  //Update User
+  app.put("/api/update/:userId",
+  [authJwt.verifyToken, authJwt.isAdmin],
+  controller.updateUser);
 };
