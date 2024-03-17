@@ -49,4 +49,9 @@ module.exports = function(app) {
   app.put("/api/update/:userId",
   [authJwt.verifyToken, authJwt.isAdmin],
   controller.updateUser);
+
+  //Add Review
+  app.post("/api/add-user-review",
+  [authJwt.verifyToken],
+  controller.addUserReview);
 };

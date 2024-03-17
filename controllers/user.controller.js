@@ -4,7 +4,7 @@
  *
  *
  * @version 1.0
- * @author  Luis Miguel Miranda
+ * @author  Luis Miguel Miranda - Andrea Olivares
  * @updated 2024-03-16
  *
 */
@@ -161,3 +161,45 @@ exports.updateUser = async(req, res) =>{
     }
 
 };
+
+// Function to add a user review to a product
+exports.addUserReview = async (req, res) => {
+    const { userId, productId, title, comment, rating } = req.body;
+    try {
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).send({ message: "User not found" });
+        }
+
+        const newReview = {
+            user: userId,
+            title: title,
+            comment: comment,
+            rating: rating
+        };
+
+        const product = await db.product.findById(productId);
+
+        if (!product) {
+            return res.status(404).send({ message: "Product not found" });
+        }
+
+        // Validate if the user has already added a review to the selected product
+        const userReview = product.reviews.filter(review => review.user.toString() == userId);
+
+        if (userReview.length > 0) {
+            return res.status(400).send({ message: "User has already added a review to this product" });
+        }
+
+        product.reviews.push(newReview);
+
+        await product.save();
+
+        res.status(200).send(product);
+
+    } catch (err) {
+        res.status(500).send({ message: err.message });
+    }
+
+}
