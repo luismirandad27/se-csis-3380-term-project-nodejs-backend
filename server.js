@@ -43,6 +43,7 @@ require('./routes/product.routes')(app);
 require('./routes/cart.routes')(app);
 require('./routes/payment.routes')(app);
 require('./routes/purchaseOrder.routes')(app);
+require('./routes/inquiry.routes')(app);
 
 // Backend port = 8080
 const PORT = process.env.PORT || 8080;
