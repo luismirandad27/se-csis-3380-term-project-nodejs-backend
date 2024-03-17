@@ -24,7 +24,7 @@ module.exports = function(app) {
   // GET all users
   app.get(
     "/api/users",
-    //[authJwt.verifyToken, authJwt.isAdmin],
+    [authJwt.verifyToken, authJwt.isAdmin],
     controller.getUsers
   );
 
@@ -57,16 +57,16 @@ module.exports = function(app) {
 
   //Get reviews for user
   app.get("/api/reviews/:userId",
-  //[authJwt.verifyToken],
+  [authJwt.verifyToken],
   controller.getReviewsByUser)
 
   //Edit User Review
   app.put("/api/editReview/:userId",
-  //[authJwt.verifyToken],
+  [authJwt.verifyToken],
   controller.editUserReview)
 
     //Delete User Review
     app.delete("/api/deleteReview/:userId",
-    //[authJwt.verifyToken],
+    [authJwt.verifyToken],
     controller.deleteUserReview)
 };
