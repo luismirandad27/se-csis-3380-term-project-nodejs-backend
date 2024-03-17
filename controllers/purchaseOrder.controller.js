@@ -141,7 +141,7 @@ exports.getPurchaseOrder = async(req, res) => {
 }
 
 // Function to get all purchase orders of a user
-export const getPurchaseOrders = async(req, res) => {
+exports.getPurchaseOrders = async(req, res) => {
   
       const { userId } = req.params;
   
