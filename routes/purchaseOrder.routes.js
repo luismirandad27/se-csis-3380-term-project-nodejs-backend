@@ -33,5 +33,11 @@ module.exports = function(app) {
     controller.getPurchaseOrder
   );
 
+  app.get(
+    "/api/orders/:userId",
+    [authJwt.verifyToken],
+    controller.getPurchaseOrders
+  )
+
 
 };
