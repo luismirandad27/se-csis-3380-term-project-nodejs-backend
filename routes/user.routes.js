@@ -24,14 +24,14 @@ module.exports = function(app) {
   // GET all users
   app.get(
     "/api/users",
-    [authJwt.verifyToken, authJwt.isAdmin],
+    //[authJwt.verifyToken, authJwt.isAdmin],
     controller.getUsers
   );
 
   //GET user by ID
   app.get(
     "/api/users/:userId",
-    [authJwt.verifyToken, authJwt.isAdmin],
+    [authJwt.verifyToken],
     controller.getUserById
   );
 
@@ -54,4 +54,19 @@ module.exports = function(app) {
   app.post("/api/add-user-review",
   [authJwt.verifyToken],
   controller.addUserReview);
+
+  //Get reviews for user
+  app.get("/api/reviews/:userId",
+  //[authJwt.verifyToken],
+  controller.getReviewsByUser)
+
+  //Edit User Review
+  app.put("/api/editReview/:userId",
+  //[authJwt.verifyToken],
+  controller.editUserReview)
+
+    //Delete User Review
+    app.delete("/api/deleteReview/:userId",
+    //[authJwt.verifyToken],
+    controller.deleteUserReview)
 };
