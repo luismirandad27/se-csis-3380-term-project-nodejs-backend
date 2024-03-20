@@ -12,7 +12,7 @@ const ReviewSchema = new mongoose.Schema({
 });
 
 const ProductSubtypeSchema = new mongoose.Schema({
-    price: Number, 
+    price: mongoose.Types.Decimal128, 
     stock: Number, 
     image_url: String,
     weight: {
