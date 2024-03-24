@@ -100,7 +100,6 @@ const UserSchema = new mongoose.Schema({
     required_change_password: Boolean,
     address: String,
     phone: String,
-    gender: String,
     roles: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Role"
