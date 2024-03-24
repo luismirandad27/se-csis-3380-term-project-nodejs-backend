@@ -42,7 +42,7 @@ module.exports = function(app) {
  
   //Change Password
   app.put("/api/changePassword/:userId",
-  [authJwt.verifyToken, authJwt.isAdmin],
+  [authJwt.verifyToken],
   controller.changePassword);
 
   //Update User
@@ -65,8 +65,12 @@ module.exports = function(app) {
   [authJwt.verifyToken],
   controller.editUserReview)
 
-    //Delete User Review
-    app.delete("/api/deleteReview/:userId",
-    [authJwt.verifyToken],
-    controller.deleteUserReview)
+  //Delete User Review
+  app.delete("/api/deleteReview/:userId",
+  [authJwt.verifyToken],
+  controller.deleteUserReview)
+
+  //Post Password Request Reset
+  app.post("/api/request-reset-password",
+  controller.requestPasswordReset)
 };
