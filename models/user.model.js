@@ -107,6 +107,7 @@ const UserSchema = new mongoose.Schema({
     company: String,
     shopping_cart: ShoppingCartSchema,
     purchase_orders: [PurchaseOrderSchema],
+    logo_image_url: String,
     created_at: Date,
     deletedAt: {
         type: Date,
