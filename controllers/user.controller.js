@@ -13,18 +13,7 @@ const db = require("../models");
 const User = db.user;
 const Role = db.role;
 const Product = db.product;
-
-exports.allAccess = (req, res) => {
-    res.status(200).send("Public Content.");
-};
-
-exports.userBoard = (req, res) => {
-    res.status(200).send("User Content.");
-};
-
-exports.adminBoard = (req, res) => {
-    res.status(200).send("Admin Content.");
-};
+const temporalPassword = '12345678';
 
 //Get all users
 exports.getUsers = async (req, res) => {
@@ -75,7 +64,7 @@ exports.inactivateUser = async (req, res) => {
 
 // Change Password
 exports.changePassword = async(req, res)=>{
-    User.findByIdAndUpdate(req.params.userId,{password:  bcrypt.hashSync(req.body.password, 8) } )
+    User.findByIdAndUpdate(req.params.userId,{password:  bcrypt.hashSync(req.body.password, 8), required_change_password: false } )
     .then((updatedDocument) => {
         if (!updatedDocument) {
             return res.status(404).send({ message: "User not found." });
@@ -294,3 +283,26 @@ exports.deleteUserReview = async(req, res)=>{
 
 }
 
+// Request password reset
+exports.requestPasswordReset = async(req, res) => {
+    const email = req.body.email;
+
+    try {
+        const user = await User
+            .findOne({ email: email });
+        
+        if (!user) {
+            return res.status(404).send({ message: "User not found" });
+        }
+
+        user.password = bcrypt.hashSync(temporalPassword, 8);
+        user.required_change_password = true;
+
+        await user.save();
+
+        res.status(200).send({ message: "Password reset request sent successfully. An email has been sent with the instructions." });
+
+    } catch (err) {
+        res.status(500).send({ message: err.message });
+    }
+}

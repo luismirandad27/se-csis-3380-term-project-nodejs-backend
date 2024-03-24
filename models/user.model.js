@@ -97,6 +97,7 @@ const UserSchema = new mongoose.Schema({
     username: String,
     email: String,
     password: String,
+    required_change_password: Boolean,
     address: String,
     phone: String,
     gender: String,
