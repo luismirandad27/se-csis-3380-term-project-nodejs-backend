@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const AutoIncrement = require("./autoIncrement.model");
 
 const TrackingLogSchema = new mongoose.Schema({
     status: String,
@@ -31,11 +32,17 @@ const OrderDetailSchema = new mongoose.Schema({
         type: Number,
         required: true,
         min: 1
+    },
+    product_rated: {
+        type: Boolean,
+        required: true,
+        default: false
     }
 })
 
 const PurchaseOrderSchema = new mongoose.Schema({
     items: [OrderDetailSchema],
+    order_number: Number,
     order_status: {
         type: String,
         enum: ['pending', 'paid', 'shipped', 'delivered'],
@@ -49,6 +56,28 @@ const PurchaseOrderSchema = new mongoose.Schema({
         type: String
     }
 })
+
+PurchaseOrderSchema.pre('save', async function (next) {
+    try {
+      const doc = this;
+      
+      const counter = await AutoIncrement.findByIdAndUpdate(
+        { _id: 'order_number' },
+        { $inc: { sequence_value: 1 } },
+        { new: true, upsert: true, useFindAndModify: false }
+      );
+  
+      if (!counter) {
+        throw new Error('Unable to fetch and update order number.');
+      }
+  
+      doc.order_number = counter.sequence_value;
+      next();
+    } catch (error) {
+      next(error);
+    }
+  });
+  
 
 const ShoppingCartItemSchema = new mongoose.Schema({
     product: {
