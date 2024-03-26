@@ -154,7 +154,7 @@ exports.updateUser = async(req, res) =>{
 
 // Function to add a user review to a product
 exports.addUserReview = async (req, res) => {
-    const { userId, productId, title, comment, rating } = req.body;
+    const { userId, productId, title, comment, rating, orderId } = req.body;
     try {
         const user = await User.findById(userId);
 
@@ -184,7 +184,24 @@ exports.addUserReview = async (req, res) => {
 
         product.reviews.push(newReview);
 
+        // Get all the orders where one of the items is at least containing the productId.
+        // This means we are rating the product not the order.
+        const userOrders = user.purchase_orders.filter(order => order.items.some(item => item.product.toString() === productId));
+
+        if (userOrders.length === 0) {
+            return res.status(404).send({ message: "Order not found" });
+        }
+
+        userOrders.forEach(order => {
+            order.items.forEach(item => {
+                if (item.product.toString() === productId) {
+                    item.product_rated = true;
+                }
+            });
+        });
+
         await product.save();
+        await user.save();
 
         res.status(200).send(product);
 
