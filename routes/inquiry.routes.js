@@ -15,6 +15,8 @@ module.exports = function(app) {
     app.post("/api/addInquiry", controller.createInquiry)
 
     //Retrieve inquiries
-    app.get("/api/inquiries", controller.getInquiries)
+    app.get("/api/inquiries", 
+    [authJwt.verifyToken, authJwt.isAdmin], 
+    controller.getInquiries)
 
 }
