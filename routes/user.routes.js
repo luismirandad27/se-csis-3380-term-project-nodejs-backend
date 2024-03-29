@@ -51,7 +51,7 @@ module.exports = function(app) {
   controller.updateUser);
 
   //Add Review
-  app.post("/api/add-user-review",
+  app.put("/api/add-user-review",
   [authJwt.verifyToken],
   controller.addUserReview);
 

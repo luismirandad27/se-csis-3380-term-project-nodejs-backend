@@ -24,6 +24,7 @@ db.inquiry = require("./inquiry.model");
 db.productCategory = require("./productCategory.model");
 db.product = require("./product.model");
 db.weightType = require("./weightType.model");
+db.autoIncrement = require("./autoIncrement.model");
 
 db.ROLES = ["user", "admin"];
 
