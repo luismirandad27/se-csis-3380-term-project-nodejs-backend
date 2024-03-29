@@ -41,11 +41,12 @@ module.exports = function(app) {
       "/api/weights", controller.getWeights);
 
   app.get("/api/productList",
-  //"/api/admin/products",
-   //[authJwt.verifyToken, authJwt.isAdmin], 
-   controller.getProductList);
+    [authJwt.verifyToken, authJwt.isAdmin], 
+    controller.getProductList);
 
-   app.put("/api/editProduct/:product", controller.updateProduct)
+   app.put("/api/editProduct/:product", 
+    [authJwt.verifyToken, authJwt.isAdmin],
+    controller.updateProduct);
  
 };
 
