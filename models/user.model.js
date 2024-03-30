@@ -54,7 +54,9 @@ const PurchaseOrderSchema = new mongoose.Schema({
     },
     stripe_session_id: {
         type: String
-    }
+    },
+    total_taxes: Number,
+    total_purchase: Number
 })
 
 PurchaseOrderSchema.pre('save', async function (next) {

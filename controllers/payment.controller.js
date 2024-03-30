@@ -50,6 +50,9 @@ exports.generateStripeCheckout = async (req, res) => {
             metadata: {
                 user_id: userId,
                 user_email: user.email
+            },
+            automatic_tax: {
+                enabled: true,
             }
         });
 
