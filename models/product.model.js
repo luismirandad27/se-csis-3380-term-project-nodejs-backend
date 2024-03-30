@@ -31,6 +31,8 @@ const ProductSchema =  new mongoose.Schema({
     },
     countries_origin : [String],
     tags : [String],
+    varietal: [String],
+    sca_score: Number,
     reviews: [ReviewSchema],
     farm: String,
     producer: String,
