@@ -30,6 +30,8 @@ exports.savePurchaseOrder = async (req, res) => {
             items: order.items,
             stripe_session_id: order.stripe_session_id,
             order_status: order.status,
+            total_taxes: order.total_taxes,
+            total_purchase: order.total_purchase,
             created_at: order.created_at,
             updated_at: order.updated_at
         };
