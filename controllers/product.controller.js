@@ -231,9 +231,9 @@ const constructFilters = async (query) => {
      if (!query.sort) {
          sortCondition = { "_id": 1 }; // Default sorting
      } else if (query.sort === "price-low-to-high") {
-         sortCondition = { "product_subtypes.price": 1 }; //Ascending
+        sortCondition = {"first_subtype_price": 1};
      } else if (query.sort === "price-high-to-low") {
-         sortCondition = { "product_subtypes.price": -1 }; //Descending
+        sortCondition = {"first_subtype_price":-1}
      } else if (query.sort === "rating") {
          sortCondition = { "average_rating": -1 };
      } else {
@@ -358,6 +358,11 @@ const getPipeline = (generalCondition, subtypeCondition, sortCondition) => {
                 product_subtypes: { $push: "$product_subtypes" }, // Reconstruct the product_subtypes array
             }
         },  
+        {
+            $addFields: {
+                first_subtype_price: { $arrayElemAt: ["$product_subtypes.price", 0] }
+            }
+        },
         {//Sorting according to query.sort
             $sort: sortCondition
         }
