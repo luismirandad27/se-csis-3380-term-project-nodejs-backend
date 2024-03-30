@@ -27,13 +27,11 @@ exports.signup = (req, res) => {
     username: req.body.username,
     email: req.body.email,
     password: bcrypt.hashSync(req.body.username, 8),
-    //password: bcrypt.hashSync(req.body.password, 8),
-    required_change_password: false,
+    required_change_password: true,
     address: req.body.address,
     phone: req.body.phone,
     company: req.body.company,
     created_at: new Date()
-
   });
 
   user.save()

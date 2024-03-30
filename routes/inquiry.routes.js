@@ -19,4 +19,9 @@ module.exports = function(app) {
     [authJwt.verifyToken, authJwt.isAdmin], 
     controller.getInquiries)
 
+    //Open an inquiry
+    app.put("/api/inquiry/:id",
+    [authJwt.verifyToken, authJwt.isAdmin],
+    controller.openInquiry)
+
 }
