@@ -5,7 +5,7 @@
  *
  * @version 1.0
  * @author  Luis Miguel Miranda - Andrea Olivares
- * @updated 2024-03-16
+ * @updated 2024-03-29
  *
 */
 var bcrypt = require("bcryptjs");
@@ -49,18 +49,27 @@ exports.getUsers = async (req, res) => {
 
 // Inactivate user
 exports.inactivateUser = async (req, res) => {
-    User.findByIdAndUpdate(req.params.userId, {deletedAt: new Date() })
-    .then((updatedDocument) => {
+    try {
+        const user = await User.findById(req.params.userId);
+        if (!user) {
+            return res.status(404).send({ message: "User not found." });
+        }
+
+        const update = user.deletedAt ? { deletedAt: null } : { deletedAt: new Date() };
+
+        const updatedDocument = await User.findByIdAndUpdate(req.params.userId, update, { new: true });
+
         if (!updatedDocument) {
             return res.status(404).send({ message: "User not found." });
         }
+        
         res.send({ message: "User account inactivated." });
-    })
-    .catch((error) => {
+    } catch (error) {
         console.error('Error soft-deleting user:', error);
-        res.status(404).send({message: err.message})
-    });
+        res.status(500).send({ message: error.message });
+    }
 };
+
 
 // Change Password
 exports.changePassword = async(req, res)=>{
@@ -81,7 +90,8 @@ exports.changePassword = async(req, res)=>{
 exports.getUserById = async (req, res) => {
     try {
         const userId = req.params.userId;
-        const user = await User.findById(userId); 
+        const user = await User.findById(userId)
+        .populate("roles"); 
 
         if (!user) {
             return res.status(404).send({ message: "User not found" }); 
@@ -99,22 +109,14 @@ exports.updateUser = async(req, res) =>{
     const userId = req.params.userId;
 
     //Verify fields are complete
-    if(!(req.body.username && req.body.email && req.body.address && req.body.phone && req.body.gender 
-        && (req.body.userRole || req.body.adminRole) && req.body.company )){
+    if(!(req.body.username && req.body.email && req.body.address && req.body.phone && req.body.roles && req.body.company )){
             return res.status(400).send({message: "Missing information!"});
         }
 
-    // Get the roles 
-    let rolesArray = [
-        req.body.userRole ? 'user' : '',
-        req.body.adminRole ? 'admin' : ''
-    ];
-    rolesArray = rolesArray.filter(role => role !== '');
-
     //Get ID for each role
-    let roles = await Promise.all(rolesArray.map(roleName => Role.findOne({ name: roleName })));
+    let roles = await Promise.all((req.body.roles).map(roleName => Role.findOne({ name: roleName })));
     const foundRoles = roles.filter(role => role != null);
-    if (foundRoles.length !== rolesArray.length) {
+    if (foundRoles.length !== (req.body.roles).length) {
         return res.status(500).send({ message: "One or more roles not found." });
     }
 
@@ -125,27 +127,19 @@ exports.updateUser = async(req, res) =>{
     if(!user){
         return res.status(404).send({ message: "User not found." });
     }
-
+ 
     //Change user fields
-    user.username = req.body.username,
-    user. email = req.body.email,
-    user.address =  req.body.address,
-    user.phone = req.body.phone,
-    user.gender = req.body.gender,
-    user.roles = roles,
-    user.company = req.body.company
-
-    //Add deletedAt modification
-    if (req.body.active === true) {
-        user.deletedAt = null; 
-    } else if (req.body.active === false && !user.deletedAt) {
-        user.deletedAt = new Date(); 
-    }
+    user.username = req.body.username;
+    user. email = req.body.email;
+    user.address =  req.body.address;
+    user.phone = req.body.phone;
+    user.roles = roles;
+    user.company = req.body.company;
 
     //Update user
     try {
-        const updatedUser = await user.save(); // Save the changes
-        res.send(updatedUser); // Send the updated user back in the response
+        const updatedUser = await user.save(); 
+        res.send(updatedUser); 
     } catch (err) {
         res.status(500).send({ message: "User could not be updated: " + err.message });
     }
