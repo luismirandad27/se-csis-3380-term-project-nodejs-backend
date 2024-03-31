@@ -5,7 +5,7 @@ exports.createInquiry = async(req, res) =>{
     const {title, body, email, phone} = req.body;
     try{
         if(!(title && body && email && phone)){
-            res.status(400).send("Missing fields!");
+           return res.status(400).json({message:"Missing fields!"});
         }
 
         const inquiry = await Inquiry.create({
@@ -51,7 +51,7 @@ exports.openInquiry = async(req, res) =>{
     try{
         const inquiry = await Inquiry.findById(req.params.id);
         if(!inquiry){
-            res.status(404).send({message: "Inquiry not found"});
+           return res.status(404).send({message: "Inquiry not found"});
         }
 
         if(!inquiry.opened){
