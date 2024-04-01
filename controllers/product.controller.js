@@ -526,9 +526,7 @@ exports.getAllProducts = async (req, res) => {
             $limit: pageSize
         }];
         const paginatedProducts = await Product.aggregate(mainPipeline);
-        console.log(paginatedProducts);
 
-        //console.log(paginatedProducts);
         res.json({
             totalPages: Math.ceil(totalCount / pageSize),
             page,
