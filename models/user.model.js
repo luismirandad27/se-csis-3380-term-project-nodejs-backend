@@ -37,6 +37,10 @@ const OrderDetailSchema = new mongoose.Schema({
         type: Boolean,
         required: true,
         default: false
+    },
+    review_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product.product_subtype.reviews"
     }
 })
 
@@ -84,7 +88,7 @@ PurchaseOrderSchema.pre('save', async function (next) {
 const ShoppingCartItemSchema = new mongoose.Schema({
     product: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Product",
+        ref: "Product", // Reference to the Product
         required: true
     },
     product_subtype: {
