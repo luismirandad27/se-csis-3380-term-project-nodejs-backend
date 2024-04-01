@@ -33,7 +33,7 @@ exports.generateStripeCheckout = async (req, res) => {
                 price_data: {
                     currency: 'usd',
                     product_data: {
-                        name: item.product.name + " (" + item.grind_type.name + ") " + item.product_subtype.name
+                        name: item.product.name + " (" + item.grind_type.name + ") " + item.product.product_subtypes[0].weight.name
                     },
                     unit_amount: parseInt(item.unit_price * 100),
                 },
@@ -50,6 +50,9 @@ exports.generateStripeCheckout = async (req, res) => {
             metadata: {
                 user_id: userId,
                 user_email: user.email
+            },
+            automatic_tax: {
+                enabled: true,
             }
         });
 

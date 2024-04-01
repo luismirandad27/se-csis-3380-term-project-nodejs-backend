@@ -15,8 +15,6 @@ db.mongoose
   })
   .then(() => {
     console.log("Successfully connect to MongoDB.");
-    // After the connectivity with MongoDB server is OK, init backend NodeJS server (Adding basic Role documents if needed)
-    initial();
   })
   .catch(err => {
     console.error("Connection error", err);
@@ -50,23 +48,3 @@ const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
-
-function initial() {
-  Role.estimatedDocumentCount()
-  .then(count => {
-    if (count === 0) {
-      // Create roles if the count is 0
-      return Promise.all([
-        new Role({ name: "user" }).save(),
-        new Role({ name: "admin" }).save()
-      ]);
-    }
-  })
-  .then(() => {
-    console.log("Roles initialized successfully.");
-  })
-  .catch(err => {
-    console.error("Error initializing roles:", err);
-  });
-}
-

@@ -4,8 +4,8 @@
  *
  *
  * @version 1.0
- * @author  Luis Miguel Miranda
- * @updated 2024-02-02
+ * @author  Luis Miguel Miranda - Andrea Olivares
+ * @updated 2024-02-29
  *
 */
 
@@ -51,24 +51,19 @@ module.exports = function(app) {
   controller.updateUser);
 
   //Add Review
-  app.post("/api/add-user-review",
+  app.put("/api/add-user-review",
   [authJwt.verifyToken],
   controller.addUserReview);
 
-  //Get reviews for user
-  app.get("/api/reviews/:userId",
-  [authJwt.verifyToken],
-  controller.getReviewsByUser)
-
-  //Edit User Review
-  app.put("/api/editReview/:userId",
-  [authJwt.verifyToken],
-  controller.editUserReview)
-
   //Delete User Review
-  app.delete("/api/deleteReview/:userId",
+  app.put("/api/deleteReview/:userId",
   [authJwt.verifyToken],
   controller.deleteUserReview)
+
+  //Get User Review
+  app.get("/api/getUserReview/:userId/:reviewId",
+  [authJwt.verifyToken],
+  controller.getUserReview)
 
   //Post Password Request Reset
   app.post("/api/request-reset-password",

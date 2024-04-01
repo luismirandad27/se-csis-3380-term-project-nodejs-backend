@@ -18,17 +18,20 @@ var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
 exports.signup = (req, res) => {
+
+  if (!(req.body.username&&req.body.email&& req.body.address&&req.body.phone&&req.body.company)){
+    return res.status(400).send({ message: "Missing information" });
+  }
+
   const user = new User({
     username: req.body.username,
     email: req.body.email,
-    password: bcrypt.hashSync(req.body.password, 8),
-    required_change_password: false,
+    password: bcrypt.hashSync(req.body.username, 8),
+    required_change_password: true,
     address: req.body.address,
     phone: req.body.phone,
-    gender: req.body.gender,
     company: req.body.company,
     created_at: new Date()
-
   });
 
   user.save()
