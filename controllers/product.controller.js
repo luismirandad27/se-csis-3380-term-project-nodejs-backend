@@ -415,13 +415,13 @@ const getPipeline = (generalCondition, subtypeCondition, sortCondition) => {
                 "product_subtypes.weight": {
                     $arrayElemAt: ["$product_subtypes.weight", 0]
                 },
-                "average_rating": {
+                "product_subtypes.average_rating": {
                     $cond: {
                         if: {
-                            $isArray: "$reviews"
+                            $isArray: "$product_subtypes.reviews"
                         },
                         then: {
-                            $avg: "$reviews.rating"
+                            $avg: "$product_subtypes.reviews.rating"
                         },
                         else: 0
                     }
@@ -453,7 +453,7 @@ const getPipeline = (generalCondition, subtypeCondition, sortCondition) => {
                     $first: "$tags"
                 },
                 average_rating: {
-                    $first: "$average_rating"
+                    $first: "$product_subtypes.average_rating"
                 },
                 reviews: {
                     $first: "$reviews"
@@ -527,7 +527,6 @@ exports.getAllProducts = async (req, res) => {
         }];
         const paginatedProducts = await Product.aggregate(mainPipeline);
 
-        //console.log(paginatedProducts);
         res.json({
             totalPages: Math.ceil(totalCount / pageSize),
             page,
