@@ -84,7 +84,7 @@ PurchaseOrderSchema.pre('save', async function (next) {
 const ShoppingCartItemSchema = new mongoose.Schema({
     product: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Product",
+        ref: "Product", // Reference to the Product
         required: true
     },
     product_subtype: {

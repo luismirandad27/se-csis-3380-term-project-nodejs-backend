@@ -9,6 +9,17 @@ const ReviewSchema = new mongoose.Schema({
         ref: "User",
         required: true
     },
+    order_number: {
+        type: Number,
+        required: true
+    },
+    order_item: {
+        type: mongoose.Schema.Types.ObjectId,
+    },
+    created_at: {
+        type: Date,
+        default: Date.now
+    }
 });
 
 const ProductSubtypeSchema = new mongoose.Schema({
@@ -18,7 +29,8 @@ const ProductSubtypeSchema = new mongoose.Schema({
     weight: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "WeightType"
-    }
+    },
+    reviews: [ReviewSchema]
 });
 
 const ProductSchema =  new mongoose.Schema({
@@ -33,7 +45,6 @@ const ProductSchema =  new mongoose.Schema({
     tags : [String],
     varietal: [String],
     sca_score: Number,
-    reviews: [ReviewSchema],
     farm: String,
     producer: String,
     region: String,

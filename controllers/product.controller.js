@@ -22,7 +22,7 @@ exports.getProductById = (req, res) => {
     .populate("import_partner")
     .populate("product_subtypes.weight")
     .populate("product_category")
-    .populate("reviews.user")
+    .populate("product_subtypes.reviews.user")
     .then(product => {
         if (!product) {
             return res.status(404).send({ message: "Product Not found." });
@@ -43,7 +43,7 @@ exports.getProductByProdId = (req, res) => {
         .populate("import_partner")
         .populate("product_subtypes.weight")
         .populate("product_category")
-        .populate("reviews.user")
+        .populate("product_subtypes.reviews.user")
         .then(product => {
             if (!product) {
                 return res.status(404).send({ message: "Product Not found." });

@@ -54,12 +54,11 @@ exports.savePurchaseOrder = async (req, res) => {
             populate: {
               path: 'items.product',
               model: 'Product',
-              select: 'name',
+              select: 'name product_subtypes._id product_subtypes.image_url product_subtypes.weight',
               populate: {
-                path: 'product_subtypes',
-                model: 'ProductSubtype'
-              },
-              select: 'name product_subtypes'
+                path: 'product_subtypes.weight',
+                model: 'WeightType'
+              }
             }
           })
           .populate({
@@ -67,13 +66,6 @@ exports.savePurchaseOrder = async (req, res) => {
             populate: {
               path: 'items.grind_type',
               model: 'GrindType'
-            }
-          })
-          .populate({
-            path: 'purchase_orders',
-            populate: {
-              path: 'items.product_subtype',
-              model: 'WeightType'
             }
           });
 
@@ -99,12 +91,11 @@ exports.getPurchaseOrder = async(req, res) => {
                             populate: {
                               path: 'items.product',
                               model: 'Product',
-                              select: 'name',
+                              select: 'name product_subtypes._id product_subtypes.image_url product_subtypes.weight',
                               populate: {
-                                path: 'product_subtypes',
-                                model: 'ProductSubtype'
-                              },
-                              select: 'name product_subtypes'
+                                path: 'product_subtypes.weight',
+                                model: 'WeightType'
+                              }
                             }
                           })
                           .populate({
@@ -112,13 +103,6 @@ exports.getPurchaseOrder = async(req, res) => {
                             populate: {
                               path: 'items.grind_type',
                               model: 'GrindType'
-                            }
-                          })
-                          .populate({
-                            path: 'purchase_orders',
-                            populate: {
-                              path: 'items.product_subtype',
-                              model: 'WeightType'
                             }
                           });
 
@@ -156,12 +140,11 @@ exports.getPurchaseOrders = async(req, res) => {
                               populate: {
                                 path: 'items.product',
                                 model: 'Product',
-                                select: 'name',
+                                select: 'name product_subtypes._id product_subtypes.image_url product_subtypes.weight',
                                 populate: {
-                                  path: 'product_subtypes',
-                                  model: 'ProductSubtype'
-                                },
-                                select: 'name product_subtypes'
+                                  path: 'product_subtypes.weight',
+                                  model: 'WeightType'
+                                }
                               }
                             })
                             .populate({
@@ -169,13 +152,6 @@ exports.getPurchaseOrders = async(req, res) => {
                               populate: {
                                 path: 'items.grind_type',
                                 model: 'GrindType'
-                              }
-                            })
-                            .populate({
-                              path: 'purchase_orders',
-                              populate: {
-                                path: 'items.product_subtype',
-                                model: 'WeightType'
                               }
                             });
   

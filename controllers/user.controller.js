@@ -148,7 +148,7 @@ exports.updateUser = async(req, res) =>{
 
 // Function to add a user review to a product
 exports.addUserReview = async (req, res) => {
-    const { userId, productId, title, comment, rating, orderId } = req.body;
+    const { userId, productId, productSubtypeId, title, comment, rating, orderId, orderNumber, itemId } = req.body;
     try {
         const user = await User.findById(userId);
 
@@ -160,14 +160,20 @@ exports.addUserReview = async (req, res) => {
             user: userId,
             title: title,
             comment: comment,
-            rating: rating
+            rating: rating,
+            orderNumber: orderNumber,
+            orderItem: itemId
         };
 
-        const product = await db.product.findById(productId);
+        // Look for the product
+        const product = await db.product.product_subtypes.findById(productSubtypeId);
 
         if (!product) {
             return res.status(404).send({ message: "Product not found" });
         }
+
+        // Look for the subproduct in the product
+        // const productSubtype = product.product_subtypes.id(productSubtypeId);
 
         // Validate if the user has already added a review to the selected product
         const userReview = product.reviews.filter(review => review.user.toString() == userId);
@@ -180,15 +186,15 @@ exports.addUserReview = async (req, res) => {
 
         // Get all the orders where one of the items is at least containing the productId.
         // This means we are rating the product not the order.
-        const userOrders = user.purchase_orders.filter(order => order.items.some(item => item.product.toString() === productId));
+        const userOrders = await db.user.purchase_orders.findById(orderId);
 
-        if (userOrders.length === 0) {
+        if (!userOrders) {
             return res.status(404).send({ message: "Order not found" });
         }
 
         userOrders.forEach(order => {
             order.items.forEach(item => {
-                if (item.product.toString() === productId) {
+                if (item._id.toString() === itemId) {
                     item.product_rated = true;
                 }
             });
