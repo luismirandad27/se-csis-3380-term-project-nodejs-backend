@@ -37,6 +37,10 @@ const OrderDetailSchema = new mongoose.Schema({
         type: Boolean,
         required: true,
         default: false
+    },
+    review_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product.product_subtype.reviews"
     }
 })
 

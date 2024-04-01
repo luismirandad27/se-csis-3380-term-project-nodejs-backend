@@ -9,12 +9,15 @@ const ReviewSchema = new mongoose.Schema({
         ref: "User",
         required: true
     },
-    order_number: {
-        type: Number,
+    order_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User.purchase_order",
         required: true
     },
-    order_item: {
+    order_item_id: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: "User.purchase_order.order_detail",
+        required: true
     },
     created_at: {
         type: Date,

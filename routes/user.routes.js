@@ -55,20 +55,15 @@ module.exports = function(app) {
   [authJwt.verifyToken],
   controller.addUserReview);
 
-  //Get reviews for user
-  app.get("/api/reviews/:userId",
-  [authJwt.verifyToken],
-  controller.getReviewsByUser)
-
-  //Edit User Review
-  app.put("/api/editReview/:userId",
-  [authJwt.verifyToken],
-  controller.editUserReview)
-
   //Delete User Review
-  app.delete("/api/deleteReview/:userId",
+  app.put("/api/deleteReview/:userId",
   [authJwt.verifyToken],
   controller.deleteUserReview)
+
+  //Get User Review
+  app.get("/api/getUserReview/:userId/:reviewId",
+  [authJwt.verifyToken],
+  controller.getUserReview)
 
   //Post Password Request Reset
   app.post("/api/request-reset-password",
