@@ -133,7 +133,7 @@ exports.getProductList = async (req, res) => {
             .populate("import_partner")
             .populate("grind_types")
             .populate("product_subtypes.weight")
-            .populate("reviews.user")
+            .populate("product_subtypes.reviews.user")
             .skip((page - 1) * pageSize)
             .limit(pageSize);
 
