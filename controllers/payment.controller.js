@@ -45,8 +45,8 @@ exports.generateStripeCheckout = async (req, res) => {
             payment_method_types: ['card'],
             line_items: lineItems,
             mode: 'payment',
-            success_url: `${process.env.FRONTEND_URL}/checkout-success`,
-            cancel_url: `${process.env.FRONTEND_URL}/checkout-cancel`,
+            success_url: `${process.env.FRONTEND_URL}/#/checkout-success`,
+            cancel_url: `${process.env.FRONTEND_URL}/#/checkout-cancel`,
             metadata: {
                 user_id: userId,
                 user_email: user.email
