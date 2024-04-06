@@ -65,25 +65,36 @@ const PurchaseOrderSchema = new mongoose.Schema({
 
 PurchaseOrderSchema.pre('save', async function (next) {
     try {
-      const doc = this;
-      
-      const counter = await AutoIncrement.findByIdAndUpdate(
-        { _id: 'order_number' },
-        { $inc: { sequence_value: 1 } },
-        { new: true, upsert: true, useFindAndModify: false }
-      );
-  
-      if (!counter) {
-        throw new Error('Unable to fetch and update order number.');
-      }
-  
-      doc.order_number = counter.sequence_value;
-      next();
+        const doc = this;
+
+        // First check if the doc.order_number exists, if it does, then it's an update
+        if (doc.order_number) {
+            return next();
+        }
+        
+        const counter = await AutoIncrement.findByIdAndUpdate({
+            _id: 'order_number'
+        }, {
+            $inc: {
+                sequence_value: 1
+            }
+        }, {
+            new: true,
+            upsert: true,
+            useFindAndModify: false
+        });
+
+        if (!counter) {
+            throw new Error('Unable to fetch and update order number.');
+        }
+
+        doc.order_number = counter.sequence_value;
+        next();
     } catch (error) {
-      next(error);
+        next(error);
     }
-  });
-  
+});
+
 
 const ShoppingCartItemSchema = new mongoose.Schema({
     product: {
