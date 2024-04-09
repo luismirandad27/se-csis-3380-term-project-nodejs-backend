@@ -15,6 +15,7 @@
           "Access-Control-Allow-Origin": "*"
         }
       }
-    ]
+    ],
+    "regions": ["sfo1"]
   }
   
