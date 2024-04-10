@@ -127,7 +127,7 @@ exports.getCartByUserId = async (req, res) => {
         populate: {
           path: 'items.product',
           model: 'Product',
-          select: 'name product_subtypes._id product_subtypes.image_url product_subtypes.weight',
+          select: 'prod_id name product_subtypes._id product_subtypes.image_url product_subtypes.weight',
           populate: {
             path: 'product_subtypes.weight',
             model: 'WeightType'
