@@ -14,7 +14,6 @@ The coffeebeanswholesale backend is like the engine behind a website that helps 
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Contributing](#contributing)
 
 ## Project Description
 
@@ -58,11 +57,3 @@ The project implements a Node.js backend with Express and MongoDB, aiming to lea
 
 1. Run the server using `npm start`.
 2. Access the API endpoints using tools like Postman or curl.
-
-## Contributing
-
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature/fooBar`).
-3. Commit your changes (`git commit -am 'Add some fooBar'`).
-4. Push to the branch (`git push origin feature/fooBar`).
-5. Create a new Pull Request.
